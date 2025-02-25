@@ -35,11 +35,26 @@ pio.renderers.default = "browser"
 # names = [pair[1] for pair in weekly_returns.columns.values]
 
 
-def build_bot(weekly_returns):
-    tickers = [pair[0] for pair in weekly_returns.columns.values]
-    names = [pair[1] for pair in weekly_returns.columns.values]
-    weekly_returns.columns = tickers
-    return _TradeBot(tickers, names, weekly_returns)
+# bot_initialization.py
+class LazyBot:
+    def __init__(self):
+        self._algo = None
+
+    @property
+    def algo(self):
+        """Initialize the bot only when accessed for the first time."""
+
+        def build_bot(weekly_returns):
+            tickers = [pair[0] for pair in weekly_returns.columns.values]
+            names = [pair[1] for pair in weekly_returns.columns.values]
+            weekly_returns.columns = tickers
+            return _TradeBot(tickers, names, weekly_returns)
+
+        if self._algo is None:
+            ROOT_DIR = Path(__file__).parent.parent
+            weekly_returns = pd.read_parquet(ROOT_DIR / "financial_data" / "all_etfs_rets.parquet.gzip")
+            self._algo = build_bot(weekly_returns=weekly_returns)
+        return self._algo
 
 
 class _TradeBot:
@@ -827,10 +842,12 @@ if __name__ == "__main__":
     # INITIALIZATION OF THE CLASS
 
     # that's unfortunate but will be addressed later
-    ROOT_DIR = Path(__file__).parent.parent
+    # ROOT_DIR = Path(__file__).parent.parent
     # Load our data
-    weekly_returns = pd.read_parquet(ROOT_DIR / "financial_data" / "all_etfs_rets.parquet.gzip")
-    algo = build_bot(weekly_returns=weekly_returns)
+    # weekly_returns = pd.read_parquet(ROOT_DIR / "financial_data" / "all_etfs_rets.parquet.gzip")
+    # algo = build_bot(weekly_returns=weekly_returns)
+
+    algo = LazyBot().algo
 
     # algo = TradeBot()
 
