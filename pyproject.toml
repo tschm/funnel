@@ -10,7 +10,6 @@ dependencies = [
     "clarabel>=0.10.0",
     "cvxpy-base>=1.6.1",
     "dotenv>=0.9.9",
-    "ecos>=2.0.14",
     "loguru>=0.7.3",
     "matplotlib>=3.10.0",
     "mosek>=11.0.8",
@@ -35,6 +34,7 @@ dev = [
     "pytest-cov>=6.0.0",
     "pytest>=8.3.3",
     "pre-commit>=4.0.1",
+    "ecos>=2.0.14",
 ]
 
 [tool.ruff]
@@ -63,3 +63,6 @@ include = [
 
 [tool.bandit]
 exclude_dirs = ["tests"]
+
+[tool.deptry.per_rule_ignores]
+DEP002 = ["clarabel","pyarrow","ecos","mosek","cvxpy-base"]

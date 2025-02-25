@@ -431,7 +431,6 @@ dependencies = [
     { name = "clarabel" },
     { name = "cvxpy-base" },
     { name = "dotenv" },
-    { name = "ecos" },
     { name = "loguru" },
     { name = "matplotlib" },
     { name = "mosek" },
@@ -450,6 +449,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "ecos" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -460,7 +460,6 @@ requires-dist = [
     { name = "clarabel", specifier = ">=0.10.0" },
     { name = "cvxpy-base", specifier = ">=1.6.1" },
     { name = "dotenv", specifier = ">=0.9.9" },
-    { name = "ecos", specifier = ">=2.0.14" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "matplotlib", specifier = ">=3.10.0" },
     { name = "mosek", specifier = ">=11.0.8" },
@@ -479,6 +478,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "ecos", specifier = ">=2.0.14" },
     { name = "pre-commit", specifier = ">=4.0.1" },
     { name = "pytest", specifier = ">=8.3.3" },
     { name = "pytest-cov", specifier = ">=6.0.0" },
