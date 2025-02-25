@@ -7,6 +7,9 @@ import pytest
 from funnel.models.MST import minimum_spanning_tree
 from funnel.models.ScenarioGeneration import MomentGenerator, ScenarioGenerator
 
+@pytest.fixture(scope="module", name="root_dir")
+def root_fixture():
+    return Path(__file__).parent.parent.parent
 
 @pytest.fixture(scope="session", name="resource_dir")
 def resource_fixture():
