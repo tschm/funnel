@@ -1,8 +1,8 @@
-SF:src/funnel/__init__.py
+SF:src/ifunnel/__init__.py
 end_of_record
-SF:src/funnel/financial_data_preprocessing/__init__.py
+SF:src/ifunnel/financial_data_preprocessing/__init__.py
 end_of_record
-SF:src/funnel/financial_data_preprocessing/clean_downloaded_data.py
+SF:src/ifunnel/financial_data_preprocessing/clean_downloaded_data.py
 DA:1,0
 DA:3,0
 DA:6,0
@@ -59,9 +59,9 @@ FNDA:0,clean_data
 FNF:1
 FNH:0
 end_of_record
-SF:src/funnel/financial_data_preprocessing/gams_transfer.py
+SF:src/ifunnel/financial_data_preprocessing/gams_transfer.py
 end_of_record
-SF:src/funnel/financial_data_preprocessing/get_algostrata_data.py
+SF:src/ifunnel/financial_data_preprocessing/get_algostrata_data.py
 DA:1,0
 DA:3,0
 DA:4,0
@@ -120,7 +120,7 @@ FNDA:0,get_algostrata_data
 FNF:2
 FNH:0
 end_of_record
-SF:src/funnel/financial_data_preprocessing/get_yahoo_data.py
+SF:src/ifunnel/financial_data_preprocessing/get_yahoo_data.py
 DA:1,0
 DA:3,0
 DA:4,0
@@ -147,7 +147,7 @@ FNDA:0,download_data
 FNF:1
 FNH:0
 end_of_record
-SF:src/funnel/models/CVaRmodel.py
+SF:src/ifunnel/models/CVaRmodel.py
 DA:1,1
 DA:3,1
 DA:4,1
@@ -226,7 +226,7 @@ FNDA:1,cvar_model
 FNF:2
 FNH:2
 end_of_record
-SF:src/funnel/models/CVaRtargets.py
+SF:src/ifunnel/models/CVaRtargets.py
 DA:1,1
 DA:2,1
 DA:3,1
@@ -280,7 +280,7 @@ FNDA:1,get_cvar_targets
 FNF:3
 FNH:3
 end_of_record
-SF:src/funnel/models/Clustering.py
+SF:src/ifunnel/models/Clustering.py
 DA:1,0
 DA:2,0
 DA:3,0
@@ -345,7 +345,7 @@ FNDA:0,pick_cluster
 FNF:3
 FNH:0
 end_of_record
-SF:src/funnel/models/MST.py
+SF:src/ifunnel/models/MST.py
 DA:1,1
 DA:2,1
 DA:3,1
@@ -391,7 +391,7 @@ FNDA:1,minimum_spanning_tree
 FNF:1
 FNH:1
 end_of_record
-SF:src/funnel/models/MVOmodel.py
+SF:src/ifunnel/models/MVOmodel.py
 DA:1,1
 DA:3,1
 DA:4,1
@@ -477,7 +477,7 @@ FNDA:1,mvo_model
 FNF:3
 FNH:2
 end_of_record
-SF:src/funnel/models/MVOtargets.py
+SF:src/ifunnel/models/MVOtargets.py
 DA:1,1
 DA:2,1
 DA:3,1
@@ -517,7 +517,7 @@ FNDA:1,get_mvo_targets
 FNF:2
 FNH:2
 end_of_record
-SF:src/funnel/models/ScenarioGeneration.py
+SF:src/ifunnel/models/ScenarioGeneration.py
 DA:1,1
 DA:3,1
 DA:4,1
@@ -697,9 +697,9 @@ FNDA:0,ScenarioGenerator.bootstrap_simulation_annual_from_weekly
 FNF:12
 FNH:6
 end_of_record
-SF:src/funnel/models/__init__.py
+SF:src/ifunnel/models/__init__.py
 end_of_record
-SF:src/funnel/models/dataAnalyser.py
+SF:src/ifunnel/models/dataAnalyser.py
 DA:1,0
 DA:2,0
 DA:5,0
@@ -738,7 +738,7 @@ FNDA:0,get_weekly_returns
 FNF:3
 FNH:0
 end_of_record
-SF:src/funnel/models/lifecycle/MVOlifecycleModel.py
+SF:src/ifunnel/models/lifecycle/MVOlifecycleModel.py
 DA:1,0
 DA:2,0
 DA:3,0
@@ -881,9 +881,9 @@ FNDA:0,riskadjust_model_scen
 FNF:6
 FNH:0
 end_of_record
-SF:src/funnel/models/lifecycle/__init__.py
+SF:src/ifunnel/models/lifecycle/__init__.py
 end_of_record
-SF:src/funnel/models/lifecycle/glidePathCreator.py
+SF:src/ifunnel/models/lifecycle/glidePathCreator.py
 DA:1,0
 DA:2,0
 DA:3,0
@@ -910,7 +910,7 @@ FNDA:0,generate_risk_profiles
 FNF:1
 FNH:0
 end_of_record
-SF:src/funnel/models/main.py
+SF:src/ifunnel/models/main.py
 DA:1,0
 DA:2,0
 DA:3,0
@@ -1209,7 +1209,7 @@ FNDA:0,_TradeBot.lifecycle_scenario_analysis
 FNF:11
 FNH:0
 end_of_record
-SF:src/funnel/settings.py
+SF:src/ifunnel/settings.py
 DA:1,0
 DA:2,0
 DA:4,0
