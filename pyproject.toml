@@ -1,5 +1,5 @@
 [project]
-name = 'funnel'
+name = 'ifunnel'
 version = "0.0.0"
 description = "Backend for the investment-funnel"
 # Please add authors and correct the email...
