@@ -24,7 +24,6 @@ dependencies = [
     "requests>=2.32.3",
     "scikit-learn>=1.6.1",
     "scipy>=1.15.2",
-    "tqdm>=4.67.1",
     "yfinance>=0.2.54",
 ]
 
