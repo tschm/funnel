@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="pdoc 15.0.1"/>
-    <title>funnel API documentation</title>
+    <title>funnel.settings API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
     <style>/*! syntax-highlighting.css */pre{line-height:125%;}span.linenos{color:inherit; background-color:transparent; padding-left:5px; padding-right:20px;}.pdoc-code .hll{background-color:#ffffcc}.pdoc-code{background:#f8f8f8;}.pdoc-code .c{color:#3D7B7B; font-style:italic}.pdoc-code .err{border:1px solid #FF0000}.pdoc-code .k{color:#008000; font-weight:bold}.pdoc-code .o{color:#666666}.pdoc-code .ch{color:#3D7B7B; font-style:italic}.pdoc-code .cm{color:#3D7B7B; font-style:italic}.pdoc-code .cp{color:#9C6500}.pdoc-code .cpf{color:#3D7B7B; font-style:italic}.pdoc-code .c1{color:#3D7B7B; font-style:italic}.pdoc-code .cs{color:#3D7B7B; font-style:italic}.pdoc-code .gd{color:#A00000}.pdoc-code .ge{font-style:italic}.pdoc-code .gr{color:#E40000}.pdoc-code .gh{color:#000080; font-weight:bold}.pdoc-code .gi{color:#008400}.pdoc-code .go{color:#717171}.pdoc-code .gp{color:#000080; font-weight:bold}.pdoc-code .gs{font-weight:bold}.pdoc-code .gu{color:#800080; font-weight:bold}.pdoc-code .gt{color:#0044DD}.pdoc-code .kc{color:#008000; font-weight:bold}.pdoc-code .kd{color:#008000; font-weight:bold}.pdoc-code .kn{color:#008000; font-weight:bold}.pdoc-code .kp{color:#008000}.pdoc-code .kr{color:#008000; font-weight:bold}.pdoc-code .kt{color:#B00040}.pdoc-code .m{color:#666666}.pdoc-code .s{color:#BA2121}.pdoc-code .na{color:#687822}.pdoc-code .nb{color:#008000}.pdoc-code .nc{color:#0000FF; font-weight:bold}.pdoc-code .no{color:#880000}.pdoc-code .nd{color:#AA22FF}.pdoc-code .ni{color:#717171; font-weight:bold}.pdoc-code .ne{color:#CB3F38; font-weight:bold}.pdoc-code .nf{color:#0000FF}.pdoc-code .nl{color:#767600}.pdoc-code .nn{color:#0000FF; font-weight:bold}.pdoc-code .nt{color:#008000; font-weight:bold}.pdoc-code .nv{color:#19177C}.pdoc-code .ow{color:#AA22FF; font-weight:bold}.pdoc-code .w{color:#bbbbbb}.pdoc-code .mb{color:#666666}.pdoc-code .mf{color:#666666}.pdoc-code .mh{color:#666666}.pdoc-code .mi{color:#666666}.pdoc-code .mo{color:#666666}.pdoc-code .sa{color:#BA2121}.pdoc-code .sb{color:#BA2121}.pdoc-code .sc{color:#BA2121}.pdoc-code .dl{color:#BA2121}.pdoc-code .sd{color:#BA2121; font-style:italic}.pdoc-code .s2{color:#BA2121}.pdoc-code .se{color:#AA5D1F; font-weight:bold}.pdoc-code .sh{color:#BA2121}.pdoc-code .si{color:#A45A77; font-weight:bold}.pdoc-code .sx{color:#008000}.pdoc-code .sr{color:#A45A77}.pdoc-code .s1{color:#BA2121}.pdoc-code .ss{color:#19177C}.pdoc-code .bp{color:#008000}.pdoc-code .fm{color:#0000FF}.pdoc-code .vc{color:#19177C}.pdoc-code .vg{color:#19177C}.pdoc-code .vi{color:#19177C}.pdoc-code .vm{color:#19177C}.pdoc-code .il{color:#666666}</style>
@@ -16,18 +16,45 @@
     <nav class="pdoc">
         <label id="navtoggle" for="togglestate" class="pdoc-button"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke-linecap='round' stroke="currentColor" stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg></label>
         <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
-        <div>
+        <div>            <a class="pdoc-button module-list-button" href="../funnel.html">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-left" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0v-2z"/>
+  <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
+</svg>                &nbsp;funnel</a>
+
 
             <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
                    pattern=".+" required>
 
 
-            <h2>Submodules</h2>
-            <ul>
-                    <li><a href="funnel/financial_data_preprocessing.html">financial_data_preprocessing</a></li>
-                    <li><a href="funnel/models.html">models</a></li>
-                    <li><a href="funnel/settings.html">settings</a></li>
-            </ul>
+
+            <h2>API Documentation</h2>
+                <ul class="memberlist">
+            <li>
+                    <a class="class" href="#Settings">Settings</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#Settings.NAME">NAME</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Settings.ALGOSTRATA_NAMES_URL">ALGOSTRATA_NAMES_URL</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Settings.ALGOSTRATA_PRICES_URL">ALGOSTRATA_PRICES_URL</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Settings.ALGOSTRATA_KEY">ALGOSTRATA_KEY</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Settings.model_config">model_config</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="variable" href="#settings">settings</a>
+            </li>
+    </ul>
 
 
 
@@ -41,13 +68,175 @@
     <main class="pdoc">
             <section class="module-info">
                     <h1 class="modulename">
-funnel    </h1>
+<a href="./../funnel.html">funnel</a><wbr>.settings    </h1>
 
                 
-                
-                
-                
+                        <input id="mod-settings-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+
+                        <label class="view-source-button" for="mod-settings-view-source"><span>View Source</span></label>
+
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseSettings</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="n">load_dotenv</span><span class="p">()</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Settings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="c1"># Would you like to download the latest AlgoStrata&#39;s data?</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="c1"># TODO write to kourosh@algostrata.dk to get your own API key</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="n">NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Investment Funnel Secrets&quot;</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="n">ALGOSTRATA_NAMES_URL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;private&quot;</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="n">ALGOSTRATA_PRICES_URL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;notgoingtotellyou&quot;</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="n">ALGOSTRATA_KEY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;nonono&quot;</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="n">settings</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">()</span>
+</span></pre></div>
+
+
             </section>
+                <section id="Settings">
+                            <input id="Settings-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">Settings</span><wbr>(<span class="base">pydantic_settings.main.BaseSettings</span>):
+
+                <label class="view-source-button" for="Settings-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Settings"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Settings-8"><a href="#Settings-8"><span class="linenos"> 8</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Settings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+</span><span id="Settings-9"><a href="#Settings-9"><span class="linenos"> 9</span></a>    <span class="c1"># Would you like to download the latest AlgoStrata&#39;s data?</span>
+</span><span id="Settings-10"><a href="#Settings-10"><span class="linenos">10</span></a>    <span class="c1"># TODO write to kourosh@algostrata.dk to get your own API key</span>
+</span><span id="Settings-11"><a href="#Settings-11"><span class="linenos">11</span></a>    <span class="n">NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Investment Funnel Secrets&quot;</span>
+</span><span id="Settings-12"><a href="#Settings-12"><span class="linenos">12</span></a>    <span class="n">ALGOSTRATA_NAMES_URL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;private&quot;</span>
+</span><span id="Settings-13"><a href="#Settings-13"><span class="linenos">13</span></a>    <span class="n">ALGOSTRATA_PRICES_URL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;notgoingtotellyou&quot;</span>
+</span><span id="Settings-14"><a href="#Settings-14"><span class="linenos">14</span></a>    <span class="n">ALGOSTRATA_KEY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;nonono&quot;</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Base class for settings, allowing values to be overridden by environment variables.</p>
+
+<p>This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+Heroku and any 12 factor app design.</p>
+
+<p>All the below attributes can be set via <code><a href="#Settings.model_config">model_config</a></code>.</p>
+
+<p>Args:
+    _case_sensitive: Whether environment and CLI variable names should be read with case-sensitivity.
+        Defaults to <code>None</code>.
+    _nested_model_default_partial_update: Whether to allow partial updates on nested model default object fields.
+        Defaults to <code>False</code>.
+    _env_prefix: Prefix for all environment variables. Defaults to <code>None</code>.
+    _env_file: The env file(s) to load settings values from. Defaults to <code>Path('')</code>, which
+        means that the value from <code>model_config['env_file']</code> should be used. You can also pass
+        <code>None</code> to indicate that environment variables should not be loaded from an env file.
+    _env_file_encoding: The env file encoding, e.g. <code>'latin-1'</code>. Defaults to <code>None</code>.
+    _env_ignore_empty: Ignore environment variables where the value is an empty string. Default to <code>False</code>.
+    _env_nested_delimiter: The nested env values delimiter. Defaults to <code>None</code>.
+    _env_nested_max_split: The nested env values maximum nesting. Defaults to <code>None</code>, which means no limit.
+    _env_parse_none_str: The env string value that should be parsed (e.g. "null", "void", "None", etc.)
+        into <code>None</code> type(None). Defaults to <code>None</code> type(None), which means no parsing should occur.
+    _env_parse_enums: Parse enum field names to values. Defaults to <code>None.</code>, which means no parsing should occur.
+    _cli_prog_name: The CLI program name to display in help text. Defaults to <code>None</code> if _cli_parse_args is <code>None</code>.
+        Otherwse, defaults to sys.argv[0].
+    _cli_parse_args: The list of CLI arguments to parse. Defaults to None.
+        If set to <code>True</code>, defaults to sys.argv[1:].
+    _cli_settings_source: Override the default CLI settings source with a user defined instance. Defaults to None.
+    _cli_parse_none_str: The CLI string value that should be parsed (e.g. "null", "void", "None", etc.) into
+        <code>None</code> type(None). Defaults to _env_parse_none_str value if set. Otherwise, defaults to "null" if
+        _cli_avoid_json is <code>False</code>, and "None" if _cli_avoid_json is <code>True</code>.
+    _cli_hide_none_type: Hide <code>None</code> values in CLI help text. Defaults to <code>False</code>.
+    _cli_avoid_json: Avoid complex JSON objects in CLI help text. Defaults to <code>False</code>.
+    _cli_enforce_required: Enforce required fields at the CLI. Defaults to <code>False</code>.
+    _cli_use_class_docs_for_groups: Use class docstrings in CLI group help text instead of field descriptions.
+        Defaults to <code>False</code>.
+    _cli_exit_on_error: Determines whether or not the internal parser exits with error info when an error occurs.
+        Defaults to <code>True</code>.
+    _cli_prefix: The root parser command line arguments prefix. Defaults to "".
+    _cli_flag_prefix_char: The flag prefix character to use for CLI optional arguments. Defaults to '-'.
+    _cli_implicit_flags: Whether <code>bool</code> fields should be implicitly converted into CLI boolean flags.
+        (e.g. --flag, --no-flag). Defaults to <code>False</code>.
+    _cli_ignore_unknown_args: Whether to ignore unknown CLI args and parse only known ones. Defaults to <code>False</code>.
+    _cli_kebab_case: CLI args use kebab case. Defaults to <code>False</code>.
+    _secrets_dir: The secret files directory or a sequence of directories. Defaults to <code>None</code>.</p>
+</div>
+
+
+                            <div id="Settings.NAME" class="classattr">
+                                <div class="attr variable">
+            <span class="name">NAME</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Settings.NAME"></a>
+    
+    
+
+                            </div>
+                            <div id="Settings.ALGOSTRATA_NAMES_URL" class="classattr">
+                                <div class="attr variable">
+            <span class="name">ALGOSTRATA_NAMES_URL</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Settings.ALGOSTRATA_NAMES_URL"></a>
+    
+    
+
+                            </div>
+                            <div id="Settings.ALGOSTRATA_PRICES_URL" class="classattr">
+                                <div class="attr variable">
+            <span class="name">ALGOSTRATA_PRICES_URL</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Settings.ALGOSTRATA_PRICES_URL"></a>
+    
+    
+
+                            </div>
+                            <div id="Settings.ALGOSTRATA_KEY" class="classattr">
+                                <div class="attr variable">
+            <span class="name">ALGOSTRATA_KEY</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Settings.ALGOSTRATA_KEY"></a>
+    
+    
+
+                            </div>
+                            <div id="Settings.model_config" class="classattr">
+                                <div class="attr variable">
+            <span class="name">model_config</span><span class="annotation">: ClassVar[pydantic_settings.main.SettingsConfigDict]</span>        =
+<input id="Settings.model_config-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+            <label class="view-value-button pdoc-button" for="Settings.model_config-view-value"></label><span class="default_value">{&#39;extra&#39;: &#39;forbid&#39;, &#39;arbitrary_types_allowed&#39;: True, &#39;validate_default&#39;: True, &#39;case_sensitive&#39;: False, &#39;env_prefix&#39;: &#39;&#39;, &#39;nested_model_default_partial_update&#39;: False, &#39;env_file&#39;: None, &#39;env_file_encoding&#39;: None, &#39;env_ignore_empty&#39;: False, &#39;env_nested_delimiter&#39;: None, &#39;env_nested_max_split&#39;: None, &#39;env_parse_none_str&#39;: None, &#39;env_parse_enums&#39;: None, &#39;cli_prog_name&#39;: None, &#39;cli_parse_args&#39;: None, &#39;cli_parse_none_str&#39;: None, &#39;cli_hide_none_type&#39;: False, &#39;cli_avoid_json&#39;: False, &#39;cli_enforce_required&#39;: False, &#39;cli_use_class_docs_for_groups&#39;: False, &#39;cli_exit_on_error&#39;: True, &#39;cli_prefix&#39;: &#39;&#39;, &#39;cli_flag_prefix_char&#39;: &#39;-&#39;, &#39;cli_implicit_flags&#39;: False, &#39;cli_ignore_unknown_args&#39;: False, &#39;cli_kebab_case&#39;: False, &#39;json_file&#39;: None, &#39;json_file_encoding&#39;: None, &#39;yaml_file&#39;: None, &#39;yaml_file_encoding&#39;: None, &#39;toml_file&#39;: None, &#39;secrets_dir&#39;: None, &#39;protected_namespaces&#39;: (&#39;model_validate&#39;, &#39;model_dump&#39;, &#39;settings_customise_sources&#39;), &#39;enable_decoding&#39;: True}</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Settings.model_config"></a>
+    
+            <div class="docstring"><p>Configuration for the model, should be a dictionary conforming to [<code>ConfigDict</code>][pydantic.config.ConfigDict].</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="settings">
+                    <div class="attr variable">
+            <span class="name">settings</span>        =
+<input id="settings-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+            <label class="view-value-button pdoc-button" for="settings-view-value"></label><span class="default_value">Settings(NAME=&#39;Investment Funnel Secrets&#39;, ALGOSTRATA_NAMES_URL=&#39;private&#39;, ALGOSTRATA_PRICES_URL=&#39;notgoingtotellyou&#39;, ALGOSTRATA_KEY=&#39;nonono&#39;)</span>
+
+        
+    </div>
+    <a class="headerlink" href="#settings"></a>
+    
+    
+
+                </section>
     </main>
 <script>
     function escapeHTML(html) {
@@ -101,7 +290,7 @@ funnel    </h1>
                 script.async = true;
                 script.onload = () => resolve(window.pdocSearch);
                 script.onerror = (e) => reject(e);
-                script.src = "search.js";
+                script.src = "../search.js";
                 document.getElementsByTagName("head")[0].appendChild(script);
             });
         } catch (e) {
@@ -143,7 +332,7 @@ funnel    </h1>
             }
             for (let result of results.slice(0, 10)) {
                 let doc = result.doc;
-                let url = `${doc.modulename.replaceAll(".", "/")}.html`;
+                let url = `../${doc.modulename.replaceAll(".", "/")}.html`;
                 if (doc.qualname) {
                     url += `#${doc.qualname}`;
                 }
