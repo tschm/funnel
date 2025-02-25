@@ -522,9 +522,7 @@ class _TradeBot:
         # fig.show()
         return fig
 
-    def mst(
-        self, start_date: str, end_date: str, n_mst_runs: int, plot: bool = False
-    ) -> tuple[None | px.scatter, list]:
+    def mst(self, start_date: str, end_date: str, n_mst_runs: int, plot: bool = False):
         """METHOD TO RUN MST METHOD AND PRINT RESULTS"""
         fig, subset_mst = None, []
 
@@ -555,7 +553,7 @@ class _TradeBot:
         n_clusters: int,
         n_assets: int,
         plot: bool = False,
-    ) -> tuple[None | px.scatter, list]:
+    ):
         """
         METHOD TO RUN MST METHOD AND PRINT RESULTS
         """
