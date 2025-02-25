@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import numpy as np
 import pandas as pd
 from loguru import logger
@@ -25,7 +23,7 @@ def portfolio_risk_target(covariance: np.array) -> float:
 # ----------------------------------------------------------------------
 def get_mvo_targets(
     test_date: str, benchmark: list, budget: int, data: pd.DataFrame
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     logger.info(f"🎯 Generating Volatility targets for {benchmark}")
 
     # Define Benchmark
@@ -34,17 +32,13 @@ def get_mvo_targets(
     whole_dataset_benchmark = data[tickers].copy()
 
     # Get weekly data just for testing period
-    test_dataset_benchmark = whole_dataset_benchmark[
-        whole_dataset_benchmark.index >= test_date
-    ]
+    test_dataset_benchmark = whole_dataset_benchmark[whole_dataset_benchmark.index >= test_date]
 
     # Number of weeks for testing
     weeks_n = len(test_dataset_benchmark.index)
 
     # Get parameters
-    sigma_lst, _ = MomentGenerator.generate_sigma_mu_for_test_periods(
-        whole_dataset_benchmark, weeks_n
-    )
+    sigma_lst, _ = MomentGenerator.generate_sigma_mu_for_test_periods(whole_dataset_benchmark, weeks_n)
 
     # Compute the optimal portfolio outperforming zero percentage return
     # ----------------------------------------------------------------------
@@ -68,9 +62,7 @@ def get_mvo_targets(
     # COMPUTE PORTFOLIO VALUE
     list_portfolio_values = []
     for w in test_dataset_benchmark.index:
-        budget_next = sum(
-            (budget / len(tickers)) * (1 + test_dataset_benchmark.loc[w, :])
-        )
+        budget_next = sum((budget / len(tickers)) * (1 + test_dataset_benchmark.loc[w, :]))
         list_portfolio_values.append(budget_next)
         budget = budget_next
 

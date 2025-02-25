@@ -49,11 +49,11 @@ repos:
     hooks:
       - id: validate-pyproject
 
-  - repo: https://github.com/crate-ci/typos
-    rev: v1.29.8
-    hooks:
-      - id: typos
-        exclude: ^\.gitignore|\.copier.answers$
+  #- repo: https://github.com/crate-ci/typos
+  #  rev: v1.29.8
+  #  hooks:
+  #    - id: typos
+  #      exclude: ^\.gitignore|\.copier.answers$
 
   #- repo: https://github.com/PyCQA/bandit
   #  rev: 1.8.3

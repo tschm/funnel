@@ -1,5 +1,4 @@
 import math
-from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -83,9 +82,7 @@ class MomentGenerator:
         robust_cov_matrix = mcd.covariance_
 
         # Convert to DataFrame for compatibility with Ledoit-Wolf function
-        robust_cov_df = pd.DataFrame(
-            robust_cov_matrix, index=X.columns, columns=X.columns
-        )
+        robust_cov_df = pd.DataFrame(robust_cov_matrix, index=X.columns, columns=X.columns)
 
         # Step 2: Apply Ledoit-Wolf Shrinkage
         shrunk_cov_df = MomentGenerator._ledoit_wolf_shrinkage(X, robust_cov_df)
@@ -93,12 +90,8 @@ class MomentGenerator:
         return shrunk_cov_df
 
     @staticmethod
-    def generate_sigma_mu_for_test_periods(
-        data: pd.DataFrame, n_test: int
-    ) -> Tuple[List, List]:
-        logger.info(
-            "⏳ Computing covariance matrix and mean array for each investment period"
-        )
+    def generate_sigma_mu_for_test_periods(data: pd.DataFrame, n_test: int) -> tuple[list, list]:
+        logger.info("⏳ Computing covariance matrix and mean array for each investment period")
 
         # Initialize variables
         sigma_lst = []
@@ -109,9 +102,7 @@ class MomentGenerator:
         n_rolls = math.floor(n_test / n_iter) + 1
 
         for p in range(int(n_rolls)):
-            rolling_train_dataset = data.iloc[
-                (n_iter * p) : (n_train_weeks + n_iter * p), :
-            ]
+            rolling_train_dataset = data.iloc[(n_iter * p) : (n_train_weeks + n_iter * p), :]
 
             sigma = np.atleast_2d(
                 np.cov(rolling_train_dataset, rowvar=False, bias=True)
@@ -165,7 +156,7 @@ class MomentGenerator:
     @staticmethod
     def generate_annual_sigma_mu_with_risk_free(
         data: pd.DataFrame, risk_free_rate_annual: float = 0.015
-    ) -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]:
+    ) -> tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]:
         """
         Computes the annualized and weekly covariance matrix (sigma) and mean return array (mu)
         for the entire historical dataset, including a risk-free asset.
@@ -181,9 +172,7 @@ class MomentGenerator:
             - sigma_weekly: Weekly covariance matrix including the risk-free asset.
             - mu_weekly: Weekly mean return vector including the risk-free asset.
         """
-        logger.debug(
-            "⏳ Generating annual Sigma and Mu parameter estimations for the optimization model."
-        )
+        logger.debug("⏳ Generating annual Sigma and Mu parameter estimations for the optimization model.")
         # Compute the sample covariance matrix for the entire dataset
 
         sigma_weekly_np = np.atleast_2d(
@@ -208,17 +197,13 @@ class MomentGenerator:
 
         # Convert numpy arrays to pandas DataFrame/Series and set appropriate asset names
         assets_with_rf = data.columns.tolist() + ["Cash"]
-        sigma_weekly = pd.DataFrame(
-            sigma_weekly_np, index=assets_with_rf, columns=assets_with_rf
-        )
+        sigma_weekly = pd.DataFrame(sigma_weekly_np, index=assets_with_rf, columns=assets_with_rf)
         mu_weekly = pd.Series(mu_weekly_np, index=assets_with_rf)
 
         # Annualize the covariance matrix and mean return array
         sigma_annual = sigma_weekly * 52
         mu_annual = mu_weekly.copy()
-        mu_annual.iloc[:-1] = (
-            mu_annual.iloc[:-1] * 52
-        )  # Annualize only the risky assets
+        mu_annual.iloc[:-1] = mu_annual.iloc[:-1] * 52  # Annualize only the risky assets
 
         return sigma_annual, mu_annual, sigma_weekly, mu_weekly
 
@@ -242,16 +227,12 @@ class ScenarioGenerator:
         sigma_lst: list,
         mu_lst: list,
     ) -> np.ndarray:
-        logger.info(
-            f"⏳ Generating {n_simulations} scenarios for each investment period with Monte Carlo method"
-        )
+        logger.info(f"⏳ Generating {n_simulations} scenarios for each investment period with Monte Carlo method")
 
         n_iter = 4  # we work with 4-week periods
         n_indices = data.shape[1]
         n_rolls = math.floor(n_test / n_iter) + 1
-        sim = np.zeros(
-            (n_rolls * 4, n_simulations, n_indices), dtype=float
-        )  # Match GAMS format
+        sim = np.zeros((n_rolls * 4, n_simulations, n_indices), dtype=float)  # Match GAMS format
 
         # First generate the weekly simulations for each rolling period
         for p in range(int(n_rolls)):
@@ -259,9 +240,7 @@ class ScenarioGenerator:
             mu = mu_lst[p]
 
             for week in range(n_iter * p, n_iter * p + n_iter):
-                sim[week, :, :] = self.rng.multivariate_normal(
-                    mean=mu, cov=sigma, size=n_simulations
-                )
+                sim[week, :, :] = self.rng.multivariate_normal(mean=mu, cov=sigma, size=n_simulations)
 
         # Now create the monthly (4-weeks) simulations for each rolling period
         monthly_sim = np.zeros((n_rolls, n_simulations, n_indices))
@@ -277,12 +256,8 @@ class ScenarioGenerator:
     # ----------------------------------------------------------------------
     # Scenario Generation: THE BOOTSTRAPPING METHOD
     # ----------------------------------------------------------------------
-    def bootstrapping(
-        self, data: pd.DataFrame, n_simulations: int, n_test: int
-    ) -> np.ndarray:
-        logger.info(
-            f"⏳ Generating {n_simulations} scenarios for each investment period with Bootstrapping method"
-        )
+    def bootstrapping(self, data: pd.DataFrame, n_simulations: int, n_test: int) -> np.ndarray:
+        logger.info(f"⏳ Generating {n_simulations} scenarios for each investment period with Bootstrapping method")
 
         n_iter = 4  # 4 weeks compounded in our scenario
         n_train_weeks = len(data.index) - n_test
@@ -301,9 +276,7 @@ class ScenarioGenerator:
         for p in range(int(n_rolls)):
             for s in range(n_simulations):
                 for w in range(n_iter):
-                    random_num = self.rng.integers(
-                        n_iter * p, n_train_weeks + n_iter * p
-                    )
+                    random_num = self.rng.integers(n_iter * p, n_train_weeks + n_iter * p)
                     sim[p, s, :, w] = data.iloc[random_num, :]
                     monthly_sim[p, s, :] *= 1 + sim[p, s, :, w]
                 monthly_sim[p, s, :] += -1
@@ -338,9 +311,7 @@ class ScenarioGenerator:
         )
         n_assets = len(weekly_mu)
         weeks_per_year = 52
-        weekly_scenarios = np.zeros(
-            (n_simulations, n_years * weeks_per_year, n_assets), dtype=float
-        )
+        weekly_scenarios = np.zeros((n_simulations, n_years * weeks_per_year, n_assets), dtype=float)
 
         # Generate weekly simulations
         for week in range(n_years * weeks_per_year):
@@ -358,20 +329,12 @@ class ScenarioGenerator:
             for simulation in range(n_simulations):
                 # Convert weekly returns to cumulative product for each asset
                 for asset in range(n_assets):
-                    if (
-                        weekly_mu.index[asset] == "Cash"
-                    ):  # Assume 'Cash' represents the risk-free asset
+                    if weekly_mu.index[asset] == "Cash":  # Assume 'Cash' represents the risk-free asset
                         # Set 'Cash' returns to a constant annual rate
                         annual_simulations[simulation, year, asset] = cash_return_annual
                     else:
                         annual_simulations[simulation, year, asset] = (
-                            np.prod(
-                                1
-                                + weekly_scenarios[
-                                    simulation, start_week:end_week, asset
-                                ]
-                            )
-                            - 1
+                            np.prod(1 + weekly_scenarios[simulation, start_week:end_week, asset]) - 1
                         )
 
         return annual_simulations
@@ -398,24 +361,16 @@ class ScenarioGenerator:
         weeks_per_year = 52
         n_assets = historical_weekly_returns.shape[1]  # Number of assets
         # Initialize the array for annual simulations
-        annual_simulations = np.zeros(
-            (n_simulations, n_years, n_assets + 1), dtype=float
-        )
+        annual_simulations = np.zeros((n_simulations, n_years, n_assets + 1), dtype=float)
 
         for simulation in range(n_simulations):
             for year in range(n_years):
                 # For each year in each simulation, sample weeks and compound
-                annual_return = np.ones(
-                    n_assets
-                )  # Start with a base of 1 for compounding
+                annual_return = np.ones(n_assets)  # Start with a base of 1 for compounding
                 for week in range(weeks_per_year):
                     # Sample a random week
-                    random_week_index = self.rng.integers(
-                        0, len(historical_weekly_returns)
-                    )
-                    weekly_return = historical_weekly_returns.iloc[
-                        random_week_index
-                    ].values
+                    random_week_index = self.rng.integers(0, len(historical_weekly_returns))
+                    weekly_return = historical_weekly_returns.iloc[random_week_index].values
                     # Compound the returns
                     annual_return *= 1 + weekly_return
                 # Calculate the annual return for this year, subtract 1 to account for the base

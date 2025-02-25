@@ -2,7 +2,6 @@ import os
 from itertools import cycle
 from math import ceil
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -32,9 +31,7 @@ pio.renderers.default = "browser"
 # that's unfortunate but will be addressed later
 ROOT_DIR = Path(__file__).parent.parent
 # Load our data
-weekly_returns = pd.read_parquet(
-    os.path.join(ROOT_DIR, "financial_data/all_etfs_rets.parquet.gzip")
-)
+weekly_returns = pd.read_parquet(os.path.join(ROOT_DIR, "financial_data/all_etfs_rets.parquet.gzip"))
 tickers = [pair[0] for pair in weekly_returns.columns.values]
 names = [pair[1] for pair in weekly_returns.columns.values]
 
@@ -61,7 +58,7 @@ class TradeBot:
         composition: pd.DataFrame,
         names: list,
         tickers: list,
-    ) -> Tuple[px.line, go.Figure]:
+    ) -> tuple[px.line, go.Figure]:
         """METHOD TO PLOT THE BACKTEST RESULTS"""
 
         performance.index = pd.to_datetime(performance.index.values, utc=True)
@@ -71,9 +68,7 @@ class TradeBot:
             df_to_plot = pd.concat([performance, performance_benchmark], axis=1)
         except Exception:
             logger.warning("⚠️ Old data format.")
-            performance.index = [
-                date.date() for date in performance.index
-            ]  # needed for old data
+            performance.index = [date.date() for date in performance.index]  # needed for old data
             df_to_plot = pd.concat([performance, performance_benchmark], axis=1)
 
         color_discrete_map = {
@@ -116,9 +111,7 @@ class TradeBot:
                 x=composition.index,
                 y=composition[isin],
                 name=str(isin),
-                marker_color=composition_color[
-                    idx_color % len(composition_color)
-                ],  # custom color
+                marker_color=composition_color[idx_color % len(composition_color)],  # custom color
             )
             data.append(trace)
             idx_color += 1
@@ -142,10 +135,10 @@ class TradeBot:
     @staticmethod
     def __plot_portfolio_densities(
         portfolio_performance_dict: dict,
-        compositions: Dict[str, pd.DataFrame],
+        compositions: dict[str, pd.DataFrame],
         tickers: list,
         names: list,
-    ) -> Tuple[go.Figure, Dict[str, go.Figure], go.Figure]:
+    ) -> tuple[go.Figure, dict[str, go.Figure], go.Figure]:
         """METHOD TO PLOT THE LIFECYCLE SIMULATION RESULTS"""
 
         # Define colors
@@ -179,9 +172,7 @@ class TradeBot:
             density = kde(x)
 
             # Update max density if current density peak is higher
-            max_density_across_all_datasets = max(
-                max_density_across_all_datasets, max(density)
-            )
+            max_density_across_all_datasets = max(max_density_across_all_datasets, max(density))
 
             # Create line plot trace for this dataset
             fig.add_trace(
@@ -190,9 +181,7 @@ class TradeBot:
                     y=density,
                     mode="lines",
                     name=label,  # Use the dictionary key as the label
-                    line=dict(
-                        width=2.5, color=next(color_cycle)
-                    ),  # Assign color from Orsted-Colors
+                    line=dict(width=2.5, color=next(color_cycle)),  # Assign color from Orsted-Colors
                 )
             )
 
@@ -239,18 +228,14 @@ class TradeBot:
         # fig.show(renderer="browser")
 
         composition_figures = {}
-        filtered_compositions = {
-            name: comp for name, comp in compositions.items() if "reverse" not in name
-        }
+        filtered_compositions = {name: comp for name, comp in compositions.items() if "reverse" not in name}
         num_portfolios = len(filtered_compositions)
         cols = 2 if num_portfolios > 1 else 1
         rows = ceil(
             num_portfolios / cols
         )  # Calculate the number of rows needed based on the total number of compositions
 
-        subplot_titles = [
-            f"Portfolio Composition: {name}" for name in filtered_compositions.keys()
-        ]
+        subplot_titles = [f"Portfolio Composition: {name}" for name in filtered_compositions.keys()]
         fig_subplots = make_subplots(
             rows=rows,
             cols=cols,
@@ -260,9 +245,7 @@ class TradeBot:
         )
 
         tickers_in_legend = set()
-        current_plot = (
-            1  # Keep track of the current plot index to correctly calculate row and col
-        )
+        current_plot = 1  # Keep track of the current plot index to correctly calculate row and col
 
         for portfolio_name, composition in filtered_compositions.items():
             composition_names = []
@@ -342,15 +325,12 @@ class TradeBot:
 
         # ANALYZE THE DATA for a given time period
         weekly_data = self.weeklyReturns[
-            (self.weeklyReturns.index >= start_date)
-            & (self.weeklyReturns.index <= end_date)
+            (self.weeklyReturns.index >= start_date) & (self.weeklyReturns.index <= end_date)
         ].copy()
 
         # Create table with summary statistics
         mu_ga = mean_an_returns(weekly_data)  # Annualised geometric mean of returns
-        std_dev_a = weekly_data.std(axis=0) * np.sqrt(
-            52
-        )  # Annualised standard deviation of returns
+        std_dev_a = weekly_data.std(axis=0) * np.sqrt(52)  # Annualised standard deviation of returns
         sharpe = round(mu_ga / std_dev_a, 2)  # Sharpe ratio of each financial product
 
         # Write all results into a data frame
@@ -367,13 +347,8 @@ class TradeBot:
 
         return stat_df
 
-    def get_top_performing_assets(
-        self, time_periods: List[Tuple[str, str]], top_percent: float = 0.2
-    ) -> List[str]:
-        stats_for_periods = {
-            f"period_{i}": self.get_stat(*period)
-            for i, period in enumerate(time_periods, 1)
-        }
+    def get_top_performing_assets(self, time_periods: list[tuple[str, str]], top_percent: float = 0.2) -> list[str]:
+        stats_for_periods = {f"period_{i}": self.get_stat(*period) for i, period in enumerate(time_periods, 1)}
 
         # Create 'Risk class' column where the value is
         # 'Risk Class 1' if Standard Deviation of Returns <= 0.005
@@ -406,23 +381,15 @@ class TradeBot:
                 data.loc[
                     data["Risk Class"] == risk_class,
                     "Top Performer",
-                ] = data.loc[
-                    data["Risk Class"] == risk_class, "Sharpe Ratio"
-                ].rank(pct=True) > (1 - top_percent)
+                ] = data.loc[data["Risk Class"] == risk_class, "Sharpe Ratio"].rank(pct=True) > (1 - top_percent)
         # for each period, save the pandas dataframe into excel files
         # for index, data in enumerate(stats_for_periods.values()):
         #     data.to_excel(f"top_performers_{time_periods[index]}.xlsx")
 
         # ISIN codes for assets which were top performers in all n periods
-        top_isins = (
-            stats_for_periods["period_1"]
-            .loc[stats_for_periods["period_1"]["Top Performer"], "ISIN"]
-            .values
-        )
+        top_isins = stats_for_periods["period_1"].loc[stats_for_periods["period_1"]["Top Performer"], "ISIN"].values
         for data in stats_for_periods.values():
-            top_isins = np.intersect1d(
-                top_isins, data.loc[data["Top Performer"], "ISIN"].values
-            )
+            top_isins = np.intersect1d(top_isins, data.loc[data["Top Performer"], "ISIN"].values)
 
         top_names = [self.names[self.tickers.index(isin)] for isin in top_isins]
 
@@ -433,11 +400,11 @@ class TradeBot:
         start_date: str,
         end_date: str,
         ml: str = "",
-        ml_subset: Union[list, pd.DataFrame] = None,
-        fund_set: Union[list, None] = None,
-        top_performers: Union[list, None] = None,
-        optimal_portfolio: Union[list, None] = None,
-        benchmark: Union[list, None] = None,
+        ml_subset: list | pd.DataFrame = None,
+        fund_set: list | None = None,
+        top_performers: list | None = None,
+        optimal_portfolio: list | None = None,
+        benchmark: list | None = None,
     ) -> px.scatter:
         """METHOD TO PLOT THE OVERVIEW OF THE FINANCIAL PRODUCTS IN TERMS OF RISK AND RETURNS"""
         fund_set = fund_set if fund_set else []
@@ -463,9 +430,7 @@ class TradeBot:
         # If selected any fund for comparison
         for fund in fund_set:
             isin_idx = list(self.names).index(fund)
-            data.loc[self.tickers[isin_idx], "Type"] = str(
-                data.loc[self.tickers[isin_idx], "Name"]
-            )
+            data.loc[self.tickers[isin_idx], "Type"] = str(data.loc[self.tickers[isin_idx], "Name"])
             data.loc[self.tickers[isin_idx], "Size"] = 3
 
         for fund in top_performers:
@@ -495,10 +460,7 @@ class TradeBot:
             hover_name="Name",
             hover_data={"Sharpe Ratio": True, "ISIN": True, "Size": False},
             color_discrete_map=color_discrete_map,
-            title="Annual Returns and Standard Deviation of Returns from "
-            + start_date[:10]
-            + " to "
-            + end_date[:10],
+            title="Annual Returns and Standard Deviation of Returns from " + start_date[:10] + " to " + end_date[:10],
         )
 
         # AXIS IN PERCENTAGES
@@ -525,9 +487,7 @@ class TradeBot:
                 actual_risk_level.add(i)
 
         if max(actual_risk_level) < 7:
-            actual_risk_level.add(
-                max(actual_risk_level) + 1
-            )  # Add the final risk level
+            actual_risk_level.add(max(actual_risk_level) + 1)  # Add the final risk level
 
         for level in actual_risk_level:
             k = "Risk Class " + str(level)
@@ -558,20 +518,17 @@ class TradeBot:
 
     def mst(
         self, start_date: str, end_date: str, n_mst_runs: int, plot: bool = False
-    ) -> Tuple[Union[None, px.scatter], list]:
+    ) -> tuple[None | px.scatter, list]:
         """METHOD TO RUN MST METHOD AND PRINT RESULTS"""
         fig, subset_mst = None, []
 
         # Starting subset of data for MST
         subset_mst_df = self.weeklyReturns[
-            (self.weeklyReturns.index >= start_date)
-            & (self.weeklyReturns.index <= end_date)
+            (self.weeklyReturns.index >= start_date) & (self.weeklyReturns.index <= end_date)
         ].copy()
 
         for i in range(n_mst_runs):
-            subset_mst, subset_mst_df, corr_mst_avg, pdi_mst = minimum_spanning_tree(
-                subset_mst_df
-            )
+            subset_mst, subset_mst_df, corr_mst_avg, pdi_mst = minimum_spanning_tree(subset_mst_df)
 
         # PLOTTING RESULTS
         if plot and len(subset_mst) > 0:
@@ -592,14 +549,13 @@ class TradeBot:
         n_clusters: int,
         n_assets: int,
         plot: bool = False,
-    ) -> Tuple[Union[None, px.scatter], list]:
+    ) -> tuple[None | px.scatter, list]:
         """
         METHOD TO RUN MST METHOD AND PRINT RESULTS
         """
         fig = None
         dataset = self.weeklyReturns[
-            (self.weeklyReturns.index >= start_date)
-            & (self.weeklyReturns.index <= end_date)
+            (self.weeklyReturns.index >= start_date) & (self.weeklyReturns.index <= end_date)
         ].copy()
         # CLUSTER DATA
         clusters = cluster(dataset, n_clusters)
@@ -636,22 +592,18 @@ class TradeBot:
         model: str,
         solver: str = "CLARABEL",
         lower_bound: int = 0,
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, px.line, go.Figure]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame, px.line, go.Figure]:
         """METHOD TO COMPUTE THE BACKTEST"""
 
         # Find Benchmarks' ISIN codes
-        benchmark_isin = [
-            self.tickers[list(self.names).index(name)] for name in benchmarks
-        ]
+        benchmark_isin = [self.tickers[list(self.names).index(name)] for name in benchmarks]
 
         # Get train and testing datasets
         whole_dataset = self.weeklyReturns[
-            (self.weeklyReturns.index >= start_train_date)
-            & (self.weeklyReturns.index <= end_test_date)
+            (self.weeklyReturns.index >= start_train_date) & (self.weeklyReturns.index <= end_test_date)
         ].copy()
         test_dataset = self.weeklyReturns[
-            (self.weeklyReturns.index > start_test_date)
-            & (self.weeklyReturns.index <= end_test_date)
+            (self.weeklyReturns.index > start_test_date) & (self.weeklyReturns.index <= end_test_date)
         ].copy()
 
         # SCENARIO GENERATION
@@ -759,7 +711,7 @@ class TradeBot:
         initial_budget: int,
         rng_seed=0,
         test_split: float = False,
-    ) -> Tuple[dict, pd.DataFrame, go.Figure, go.Figure, dict, dict, go.Figure]:
+    ) -> tuple[dict, pd.DataFrame, go.Figure, go.Figure, dict, dict, go.Figure]:
         """METHOD TO COMPUTE THE LIFECYCLE SCENARIO ANALYSIS"""
 
         # ------------------------------- INITIALIZE FUNCTION -------------------------------
@@ -772,20 +724,12 @@ class TradeBot:
                 data=self.weeklyReturns[subset_of_assets], sampling_ratio=test_split
             )
 
-            _, _, sigma_weekly, mu_weekly = (
-                MomentGenerator.generate_annual_sigma_mu_with_risk_free(
-                    data=sampling_set
-                )
-            )
+            _, _, sigma_weekly, mu_weekly = MomentGenerator.generate_annual_sigma_mu_with_risk_free(data=sampling_set)
 
-            sigma, mu, _, _ = MomentGenerator.generate_annual_sigma_mu_with_risk_free(
-                data=estimating_set
-            )
+            sigma, mu, _, _ = MomentGenerator.generate_annual_sigma_mu_with_risk_free(data=estimating_set)
         else:
-            sigma, mu, sigma_weekly, mu_weekly = (
-                MomentGenerator.generate_annual_sigma_mu_with_risk_free(
-                    data=self.weeklyReturns[subset_of_assets]
-                )
+            sigma, mu, sigma_weekly, mu_weekly = MomentGenerator.generate_annual_sigma_mu_with_risk_free(
+                data=self.weeklyReturns[subset_of_assets]
             )
 
         # ------------------------------- SCENARIO GENERATION -------------------------------
@@ -852,19 +796,15 @@ class TradeBot:
             # Add the analysis_metrics DataFrame as a new column in the storage DataFrame
             exhibition_summary[key] = analysis_metrics.squeeze()
 
-            portfolio_df["Terminal Wealth"] = pd.to_numeric(
-                portfolio_df["Terminal Wealth"], errors="coerce"
-            )
+            portfolio_df["Terminal Wealth"] = pd.to_numeric(portfolio_df["Terminal Wealth"], errors="coerce")
             terminal_wealth_dict[f"{key}"] = portfolio_df
 
         # ------------------------------- PLOTTING -------------------------------
-        fig_performance, fig_compositions, fig_compositions_all = (
-            self.__plot_portfolio_densities(
-                portfolio_performance_dict=terminal_wealth_dict,
-                compositions=allocation_targets,
-                tickers=self.tickers,
-                names=self.names,
-            )
+        fig_performance, fig_compositions, fig_compositions_all = self.__plot_portfolio_densities(
+            portfolio_performance_dict=terminal_wealth_dict,
+            compositions=allocation_targets,
+            tickers=self.tickers,
+            names=self.names,
         )
 
         # ------------------------------- RETURN STATISTICS -------------------------------
@@ -894,14 +834,10 @@ if __name__ == "__main__":
     )
 
     # PLOT INTERACTIVE GRAPH
-    algo.plot_dots(
-        start_date=algo.min_date, end_date=algo.max_date, top_performers=top_assets
-    )
+    algo.plot_dots(start_date=algo.min_date, end_date=algo.max_date, top_performers=top_assets)
 
     # RUN THE MINIMUM SPANNING TREE METHOD
-    _, mst_subset_of_assets = algo.mst(
-        start_date="2000-01-01", end_date="2024-01-01", n_mst_runs=5, plot=False
-    )
+    _, mst_subset_of_assets = algo.mst(start_date="2000-01-01", end_date="2024-01-01", n_mst_runs=5, plot=False)
 
     # RUN THE CLUSTERING METHOD
     _, clustering_subset_of_assets = algo.clustering(

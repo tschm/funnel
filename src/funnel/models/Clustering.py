@@ -38,9 +38,7 @@ def fancy_dendrogram(*args, **kwargs):
     return d_data
 
 
-def cluster(
-    data: pd.DataFrame, n_clusters: int, dendrogram: bool = False
-) -> pd.DataFrame:
+def cluster(data: pd.DataFrame, n_clusters: int, dendrogram: bool = False) -> pd.DataFrame:
     """
     FUNCTION TO CLUSTER DATA
     """
@@ -50,12 +48,8 @@ def cluster(
     distance_corr = 1 - corr  # distance based on correlation
 
     # Person corr distance matrix
-    con_distance_corr = squareform(
-        distance_corr
-    )  # the distance matrix to be able to fit the hierarchical clustering
-    complete_corr = complete(
-        con_distance_corr
-    )  # apply hierarchical clustering using the single distance measure
+    con_distance_corr = squareform(distance_corr)  # the distance matrix to be able to fit the hierarchical clustering
+    complete_corr = complete(con_distance_corr)  # apply hierarchical clustering using the single distance measure
 
     if dendrogram:
         # draw the dendrogram
@@ -82,22 +76,16 @@ def cluster(
     cluster_df = pd.DataFrame(index=distance_corr.index)
 
     # Save the Complete_Corr clustering into the dataframe with 8 clusters
-    cluster_df["Complete_Corr"] = fcluster(
-        complete_corr, n_clusters, criterion="maxclust"
-    )
+    cluster_df["Complete_Corr"] = fcluster(complete_corr, n_clusters, criterion="maxclust")
 
     # Column for plotting
     for index in cluster_df.index:
-        cluster_df.loc[index, "Cluster"] = "Cluster " + str(
-            cluster_df.loc[index, "Complete_Corr"]
-        )
+        cluster_df.loc[index, "Cluster"] = "Cluster " + str(cluster_df.loc[index, "Complete_Corr"])
 
     return cluster_df
 
 
-def pick_cluster(
-    data: pd.DataFrame, stat: pd.DataFrame, ml: pd.DataFrame, n_assets: int
-) -> (list, pd.DataFrame):
+def pick_cluster(data: pd.DataFrame, stat: pd.DataFrame, ml: pd.DataFrame, n_assets: int) -> (list, pd.DataFrame):
     """
     METHOD TO PICK ASSETS FROM A CLUSTER BASED ON PERFORMANCE CRITERIA
     """
@@ -109,17 +97,9 @@ def pick_cluster(
         max_size = len(test[test["Cluster"] == str(clus)])
         # Get indexes
         if n_assets <= max_size:
-            ids.extend(
-                test[test["Cluster"] == str(clus)]
-                .nlargest(n_assets, ["Sharpe Ratio"])
-                .index
-            )
+            ids.extend(test[test["Cluster"] == str(clus)].nlargest(n_assets, ["Sharpe Ratio"]).index)
         else:
-            ids.extend(
-                test[test["Cluster"] == str(clus)]
-                .nlargest(max_size, ["Sharpe Ratio"])
-                .index
-            )
+            ids.extend(test[test["Cluster"] == str(clus)].nlargest(max_size, ["Sharpe Ratio"]).index)
             logger.warning(f"⚠️ In {clus} was picked only {max_size} assets")
 
     # Get returns

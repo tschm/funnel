@@ -1,5 +1,4 @@
 import pickle
-from typing import Tuple
 
 import cvxpy as cp
 import numpy as np
@@ -101,9 +100,7 @@ def rebalancing_model(
     ]
 
     if lower_bound != 0:
-        z = cp.Variable(
-            N, boolean=True
-        )  # Binary variable indicates if asset is selected
+        z = cp.Variable(N, boolean=True)  # Binary variable indicates if asset is selected
         upper_bound = 100
 
         constraints.append(lower_bound * z <= x)
@@ -152,9 +149,7 @@ def rebalancing_model(
         file.close()
 
         # Print an error if the model is not optimal
-        logger.exception(
-            f"❌ Solver does not find optimal solution. Status code is {model.status}"
-        )
+        logger.exception(f"❌ Solver does not find optimal solution. Status code is {model.status}")
 
 
 # ----------------------------------------------------------------------
@@ -171,7 +166,7 @@ def cvar_model(
     solver: str,
     inaccurate: bool = True,
     lower_bound=int,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Method to run the CVaR model over given periods
     """
@@ -199,9 +194,7 @@ def cvar_model(
         scenarios_df = pd.DataFrame(scenarios[p, :, :], columns=test_ret.columns)
 
         # compute expected returns of all assets (EP)
-        expected_returns = sum(
-            prob * scenarios_df.loc[i, :] for i in scenarios_df.index
-        )
+        expected_returns = sum(prob * scenarios_df.loc[i, :] for i in scenarios_df.index)
 
         # run CVaR model
         p_alloc, cvar_val, port_val, cash = rebalancing_model(
@@ -226,17 +219,15 @@ def cvar_model(
         portfolio_value_w = port_val
         # COMPUTE PORTFOLIO VALUE
         for w in test_ret.index[(p * 4) : (4 + p * 4)]:
-            portfolio_value_w = sum(
-                p_alloc * portfolio_value_w * (1 + test_ret.loc[w, assets])
-            )
+            portfolio_value_w = sum(p_alloc * portfolio_value_w * (1 + test_ret.loc[w, assets]))
             list_portfolio_value.append((w, portfolio_value_w))
 
         x_old = p_alloc * portfolio_value_w
 
     portfolio_cvar = pd.DataFrame(columns=["CVaR"], data=list_portfolio_cvar)
-    portfolio_value = pd.DataFrame(
-        columns=["Date", "Portfolio_Value"], data=list_portfolio_value
-    ).set_index("Date", drop=True)
+    portfolio_value = pd.DataFrame(columns=["Date", "Portfolio_Value"], data=list_portfolio_value).set_index(
+        "Date", drop=True
+    )
     portfolio_allocation = pd.DataFrame(columns=assets, data=list_portfolio_allocation)
 
     return portfolio_allocation, portfolio_value, portfolio_cvar

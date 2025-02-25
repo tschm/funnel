@@ -12,10 +12,7 @@ def clean_data(data_raw):
     # Delete tickers for which we don't have data for the whole time period
     for column in data_raw.columns:
         # if the first three or last three values of the column are not empty, then delete the column
-        if (
-            not data_raw[column].values[:3].all()
-            or not data_raw[column].values[-3:].all()
-        ):
+        if not data_raw[column].values[:3].all() or not data_raw[column].values[-3:].all():
             data_raw.drop(column, axis=1, inplace=True)
 
     # Fill missing daily prices with the closest available price in the future
@@ -56,9 +53,7 @@ def clean_data(data_raw):
         date_test = date_test + pd.Timedelta(days=7)
         if date_test not in data_wed.index:
             print(date_test)
-            data_wed.loc[date_test] = data.loc[
-                date_test - pd.Timedelta(days=5)
-            ].to_list()
+            data_wed.loc[date_test] = data.loc[date_test - pd.Timedelta(days=5)].to_list()
 
     # Sort df by index
     data_wed = data_wed.sort_index()
@@ -75,22 +70,16 @@ def clean_data(data_raw):
     data_wed_rets = data_wed_rets[wanted_columns]
     # Save results with returns into data folder for the app
     data_wed_rets.to_parquet(
-        os.path.join(
-            os.path.dirname(os.getcwd()), "financial_data/all_etfs_rets.parquet.gzip"
-        ),
+        os.path.join(os.path.dirname(os.getcwd()), "financial_data/all_etfs_rets.parquet.gzip"),
         compression="gzip",
     )
 
 
 if __name__ == "__main__":
-    daily_prices = pd.read_parquet(
-        os.path.join(os.path.dirname(os.getcwd()), "financial_data/daily_price.parquet")
-    )
+    daily_prices = pd.read_parquet(os.path.join(os.path.dirname(os.getcwd()), "financial_data/daily_price.parquet"))
 
     # Select just some indices
-    subset_data = daily_prices[
-        (daily_prices.index > "2013-01-01") & (daily_prices.index < "2024-07-28")
-    ]
+    subset_data = daily_prices[(daily_prices.index > "2013-01-01") & (daily_prices.index < "2024-07-28")]
 
     # Clean data and save for the investment funnel app
     clean_data(data_raw=subset_data)

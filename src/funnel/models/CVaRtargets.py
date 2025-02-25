@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import numpy as np
 import pandas as pd
 from loguru import logger
@@ -8,7 +6,7 @@ from .ScenarioGeneration import ScenarioGenerator
 
 
 # Primal CVaR formula
-def CVaR(alpha: float, p: np.array, q: np.array) -> Tuple[float, float]:
+def CVaR(alpha: float, p: np.array, q: np.array) -> tuple[float, float]:
     """
     Computes CVaR using primal formula.
     NOTE: Inputs p and q should be numpy arrays.
@@ -28,9 +26,7 @@ def CVaR(alpha: float, p: np.array, q: np.array) -> Tuple[float, float]:
 
     # CVaR
     var = sorted_q[i_alpha]
-    cvar = lambda_alpha * sorted_q[i_alpha] + np.dot(
-        sorted_p[(i_alpha + 1) :], sorted_q[(i_alpha + 1) :]
-    ) / (1 - alpha)
+    cvar = lambda_alpha * sorted_q[i_alpha] + np.dot(sorted_p[(i_alpha + 1) :], sorted_q[(i_alpha + 1) :]) / (1 - alpha)
 
     return var, cvar
 
@@ -67,7 +63,7 @@ def get_cvar_targets(
     data: pd.DataFrame,
     scgen: ScenarioGenerator,
     n_simulations: int,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     logger.info(f"🎯 Generating CVaR targets for {benchmark}")
 
     # Define Benchmark
@@ -76,9 +72,7 @@ def get_cvar_targets(
     whole_dataset_benchmark = data[tickers].copy()
 
     # Get weekly data just for testing period
-    test_dataset_benchmark = whole_dataset_benchmark[
-        whole_dataset_benchmark.index >= test_date
-    ]
+    test_dataset_benchmark = whole_dataset_benchmark[whole_dataset_benchmark.index >= test_date]
 
     # Number of weeks for testing
     weeks_n = len(test_dataset_benchmark.index)
@@ -100,14 +94,10 @@ def get_cvar_targets(
     list_targets = []
     for p in range(p_points):
         # create data frame with scenarios for a given period p
-        scenario_df = pd.DataFrame(
-            target_scenarios[p, :, :], columns=tickers, index=list(range(s_points))
-        )
+        scenario_df = pd.DataFrame(target_scenarios[p, :, :], columns=tickers, index=list(range(s_points)))
 
         # run CVaR model to compute CVaR targets
-        cvar_target = portfolio_risk_target(
-            scenarios=scenario_df, cvar_alpha=cvar_alpha
-        )
+        cvar_target = portfolio_risk_target(scenarios=scenario_df, cvar_alpha=cvar_alpha)
         # save the result
         list_targets.append(cvar_target)
 
@@ -117,9 +107,7 @@ def get_cvar_targets(
     # COMPUTE PORTFOLIO VALUE
     list_portfolio_values = []
     for w in test_dataset_benchmark.index:
-        budget_next = sum(
-            (budget / len(tickers)) * (1 + test_dataset_benchmark.loc[w, :])
-        )
+        budget_next = sum((budget / len(tickers)) * (1 + test_dataset_benchmark.loc[w, :]))
         list_portfolio_values.append(budget_next)
         budget = budget_next
 

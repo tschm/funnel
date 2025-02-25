@@ -10,9 +10,7 @@ def minimum_spanning_tree(dataset: pd.DataFrame) -> (list, pd.DataFrame, float, 
 
     corr = dataset.corr(method="spearman")  # calculate the correlation
     distance_corr = (2 * (1 - corr)) ** 0.5  # calculate the distance
-    mask = np.triu(
-        np.ones_like(corr, dtype=bool)
-    )  # get only the upper half of the matrix
+    mask = np.triu(np.ones_like(corr, dtype=bool))  # get only the upper half of the matrix
     distance_corr = distance_corr * mask
 
     # use the correlation matrix to create links
@@ -22,17 +20,13 @@ def minimum_spanning_tree(dataset: pd.DataFrame) -> (list, pd.DataFrame, float, 
     links = links.replace(0, np.nan)  # drop 0 values from the matrix
     links = links.dropna(how="any", axis=0)
     links.columns = ["var1", "var2", "value"]  # rename the columns
-    links_filtered = links.loc[
-        (links["var1"] != links["var2"])
-    ]  # filter out self-correlations
+    links_filtered = links.loc[(links["var1"] != links["var2"])]  # filter out self-correlations
 
     # Create the graph
     created_graph = nx.Graph()
     for i in range(len(corr)):  # add nodes
         created_graph.add_node(corr.index[i])
-    tuples = list(
-        links_filtered.itertuples(index=False, name=None)
-    )  # add edges with weight
+    tuples = list(links_filtered.itertuples(index=False, name=None))  # add edges with weight
     created_graph.add_weighted_edges_from(tuples)
 
     # Create a MST from the full graph

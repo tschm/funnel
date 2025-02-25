@@ -12,9 +12,7 @@ def save_into_gdx(monthly_returns_df):
     # *** CREATE GDX FILE ***
     # Initialization for GAMS version v47
     # Documentation: https://www.gams.com/latest/docs/API_PY_GAMSTRANSFER.html#PY_GAMSTRANSFER_INSTALLATION
-    m = gt.Container(
-        system_directory="/Library/Frameworks/GAMS.framework/Versions/47/Resources/"
-    )
+    m = gt.Container(system_directory="/Library/Frameworks/GAMS.framework/Versions/47/Resources/")
 
     # Sets
     asset_set = m.addSet(

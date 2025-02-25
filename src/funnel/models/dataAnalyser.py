@@ -22,9 +22,7 @@ def final_stats(data: pd.DataFrame) -> pd.DataFrame:
     data = data.drop(data.index[:1])
 
     mu_ga = round(mean_an_returns(data), 2)  # annual geometric mean
-    std_dev_a = round(
-        data.std(axis=0) * np.sqrt(52), 2
-    )  # standard deviation of Annual Returns
+    std_dev_a = round(data.std(axis=0) * np.sqrt(52), 2)  # standard deviation of Annual Returns
 
     stat_df = pd.concat([mu_ga, std_dev_a], axis=1)  # table
     stat_names = ["Average Annual Returns", "Standard Deviation of Returns"]
@@ -32,8 +30,7 @@ def final_stats(data: pd.DataFrame) -> pd.DataFrame:
 
     # COMPUTE SHARPE RATIO AND ADD IT INTO THE TABLE
     sharpe = round(
-        stat_df.loc[:, "Average Annual Returns"]
-        / stat_df.loc[:, "Standard Deviation of Returns"],
+        stat_df.loc[:, "Average Annual Returns"] / stat_df.loc[:, "Standard Deviation of Returns"],
         2,
     )
     stat_df = pd.concat([stat_df, sharpe], axis=1)  # add sharpe ratio into the table

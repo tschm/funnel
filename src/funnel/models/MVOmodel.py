@@ -1,5 +1,4 @@
 import pickle
-from typing import Tuple
 
 import cvxpy as cp
 import numpy as np
@@ -13,9 +12,7 @@ def cholesky_psd(m):
     Computes the Cholesky decomposition of the given matrix, that is not positive definite, only semidefinite.
     """
     lu, d, perm = sp.linalg.ldl(m)
-    assert (
-        np.max(np.abs(d - np.diag(np.diag(d)))) < 1e-12
-    ), "Matrix 'd' is not diagonal!"
+    assert np.max(np.abs(d - np.diag(np.diag(d)))) < 1e-12, "Matrix 'd' is not diagonal!"
 
     # Do non-negativity fix
     min_eig = np.min(np.diag(d))
@@ -110,9 +107,7 @@ def rebalancing_model(
     ]
 
     if lower_bound != 0:
-        z = cp.Variable(
-            N, boolean=True
-        )  # Binary variable indicates if asset is selected
+        z = cp.Variable(N, boolean=True)  # Binary variable indicates if asset is selected
         upper_bound = 100
 
         constraints.append(lower_bound * z <= x)
@@ -161,9 +156,7 @@ def rebalancing_model(
         file.close()
 
         # Print an error if the model is not optimal
-        logger.exception(
-            f"❌ Solver does not find optimal solution. Status code is {model.status}"
-        )
+        logger.exception(f"❌ Solver does not find optimal solution. Status code is {model.status}")
 
 
 # ----------------------------------------------------------------------
@@ -180,7 +173,7 @@ def mvo_model(
     solver: str,
     lower_bound: int,
     inaccurate: bool = True,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Method to run the MVO model over given periods
     """
@@ -229,17 +222,15 @@ def mvo_model(
         portfolio_value_w = port_val
         # COMPUTE PORTFOLIO VALUE
         for w in test_ret.index[(p * 4) : (4 + p * 4)]:
-            portfolio_value_w = sum(
-                p_alloc * portfolio_value_w * (1 + test_ret.loc[w, assets])
-            )
+            portfolio_value_w = sum(p_alloc * portfolio_value_w * (1 + test_ret.loc[w, assets]))
             list_portfolio_value.append((w, portfolio_value_w))
 
         x_old = p_alloc * portfolio_value_w
 
     portfolio_vty = pd.DataFrame(columns=["Volatility"], data=list_portfolio_vty)
-    portfolio_value = pd.DataFrame(
-        columns=["Date", "Portfolio_Value"], data=list_portfolio_value
-    ).set_index("Date", drop=True)
+    portfolio_value = pd.DataFrame(columns=["Date", "Portfolio_Value"], data=list_portfolio_value).set_index(
+        "Date", drop=True
+    )
     portfolio_allocation = pd.DataFrame(columns=assets, data=list_portfolio_allocation)
 
     return portfolio_allocation, portfolio_value, portfolio_vty

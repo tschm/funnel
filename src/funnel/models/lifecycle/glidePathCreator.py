@@ -3,9 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 
-def generate_risk_profiles(
-    n_periods: int, initial_risk: float, minimum_risk: float
-) -> (pd.DataFrame, px.line):
+def generate_risk_profiles(n_periods: int, initial_risk: float, minimum_risk: float) -> (pd.DataFrame, px.line):
     """Generate risk profiles for glide paths."""
 
     df = pd.DataFrame(index=range(n_periods))

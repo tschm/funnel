@@ -69,16 +69,12 @@ def get_algostrata_data() -> pd.DataFrame:
             if asset["priceData"] is not None:
                 priceData = asset["priceData"]
                 reInvestedPrices = priceData["reInvestedPrices"]
-                dates = list(
-                    map(lambda x: dateutil.parser.parse(x["date"]), reInvestedPrices)
-                )
+                dates = list(map(lambda x: dateutil.parser.parse(x["date"]), reInvestedPrices))
                 prices = list(map(lambda x: x["unit_DKK"], reInvestedPrices))
 
                 # IF THE FIRST RUN, THEN CREATE A TABLE
                 if firstRun:
-                    daily_prices = pd.DataFrame(
-                        prices, index=dates, columns=[isinList[0:1], nameList[0:1]]
-                    )
+                    daily_prices = pd.DataFrame(prices, index=dates, columns=[isinList[0:1], nameList[0:1]])
                     firstRun = False
                 # IF NOT THE FIRST RUN, JUST CONCAT THE COLUMN INTO EXISTING TABLE
                 else:
@@ -102,6 +98,4 @@ if __name__ == "__main__":
     # Download raw data
     data_algostrata = get_algostrata_data()
     # Save daily_prices into parquet file
-    data_algostrata.to_parquet(
-        os.path.join(os.path.dirname(os.getcwd()), "financial_data/daily_price.parquet")
-    )
+    data_algostrata.to_parquet(os.path.join(os.path.dirname(os.getcwd()), "financial_data/daily_price.parquet"))
