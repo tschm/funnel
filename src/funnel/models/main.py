@@ -1,4 +1,3 @@
-import os
 from itertools import cycle
 from math import ceil
 from pathlib import Path
@@ -29,20 +28,27 @@ from .ScenarioGeneration import MomentGenerator, ScenarioGenerator
 pio.renderers.default = "browser"
 
 # that's unfortunate but will be addressed later
-ROOT_DIR = Path(__file__).parent.parent
+# ROOT_DIR = Path(__file__).parent.parent
 # Load our data
-weekly_returns = pd.read_parquet(os.path.join(ROOT_DIR, "financial_data/all_etfs_rets.parquet.gzip"))
-tickers = [pair[0] for pair in weekly_returns.columns.values]
-names = [pair[1] for pair in weekly_returns.columns.values]
+# weekly_returns = pd.read_parquet(os.path.join(ROOT_DIR, "financial_data/all_etfs_rets.parquet.gzip"))
+# tickers = [pair[0] for pair in weekly_returns.columns.values]
+# names = [pair[1] for pair in weekly_returns.columns.values]
 
 
-class TradeBot:
+def build_bot(weekly_returns):
+    tickers = [pair[0] for pair in weekly_returns.columns.values]
+    names = [pair[1] for pair in weekly_returns.columns.values]
+    weekly_returns.columns = tickers
+    return _TradeBot(tickers, names, weekly_returns)
+
+
+class _TradeBot:
     """
     Python class analysing financial products and based on machine learning algorithms and mathematical
     optimization suggesting optimal portfolio of assets.
     """
 
-    def __init__(self):
+    def __init__(self, tickers, names, weekly_returns):
         self.tickers = tickers
         self.names = names
         self.weeklyReturns = weekly_returns
@@ -821,7 +827,14 @@ class TradeBot:
 
 if __name__ == "__main__":
     # INITIALIZATION OF THE CLASS
-    algo = TradeBot()
+
+    # that's unfortunate but will be addressed later
+    ROOT_DIR = Path(__file__).parent.parent
+    # Load our data
+    weekly_returns = pd.read_parquet(ROOT_DIR / "financial_data" / "all_etfs_rets.parquet.gzip")
+    algo = build_bot(weekly_returns=weekly_returns)
+
+    # algo = TradeBot()
 
     # Get top performing assets for given periods and measure
     top_assets = algo.get_top_performing_assets(
