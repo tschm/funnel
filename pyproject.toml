@@ -7,8 +7,20 @@ authors = [{name='tschm', email= 'tschm@mailinator.com'}]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "clarabel>=0.10.0",
+    "cvxpy-base>=1.6.1",
+    "loguru>=0.7.3",
+    "matplotlib>=3.10.0",
+    "mosek>=11.0.8",
+    "networkx>=3.4.2",
     "numpy>=2.2.3",
     "pandas>=2.2.3",
+    "plotly>=6.0.0",
+    "pyarrow>=19.0.1",
+    "requests>=2.32.3",
+    "scikit-learn>=1.6.1",
+    "tqdm>=4.67.1",
+    "yfinance>=0.2.54",
 ]
 
 [project.urls]
