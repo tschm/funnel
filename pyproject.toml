@@ -3,7 +3,9 @@ name = 'ifunnel'
 version = "0.0.0"
 description = "Backend for the investment-funnel"
 # Please add authors and correct the email...
-authors = [{name='tschm', email= 'thomas.schmelzer@gmaili.com'}]
+authors = [{name='Thomas Schmelzer', email= 'thomas.schmelzer@gmaili.com'},
+           {name="Petr Vanek", email="abc@gmail.com"}
+]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
