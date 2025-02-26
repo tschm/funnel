@@ -1,3 +1,4 @@
+from functools import lru_cache
 from itertools import cycle
 from math import ceil
 from pathlib import Path
@@ -35,26 +36,19 @@ pio.renderers.default = "browser"
 # names = [pair[1] for pair in weekly_returns.columns.values]
 
 
-# bot_initialization.py
-class LazyBot:
-    def __init__(self):
-        self._algo = None
+@lru_cache(maxsize=1)  # Cache the result of this function
+def initialize_bot(file=None):
+    """Initialize and return the trading bot."""
+    if file is None:
+        ROOT_DIR = Path(__file__).parent.parent
+        file = ROOT_DIR / "financial_data" / "all_etfs_rets.parquet.gzip"
 
-    @property
-    def algo(self):
-        """Initialize the bot only when accessed for the first time."""
+    weekly_returns = pd.read_parquet(file)
 
-        def build_bot(weekly_returns):
-            tickers = [pair[0] for pair in weekly_returns.columns.values]
-            names = [pair[1] for pair in weekly_returns.columns.values]
-            weekly_returns.columns = tickers
-            return _TradeBot(tickers, names, weekly_returns)
-
-        if self._algo is None:
-            ROOT_DIR = Path(__file__).parent.parent
-            weekly_returns = pd.read_parquet(ROOT_DIR / "financial_data" / "all_etfs_rets.parquet.gzip")
-            self._algo = build_bot(weekly_returns=weekly_returns)
-        return self._algo
+    tickers = [pair[0] for pair in weekly_returns.columns.values]
+    names = [pair[1] for pair in weekly_returns.columns.values]
+    weekly_returns.columns = tickers
+    return _TradeBot(tickers, names, weekly_returns)
 
 
 class _TradeBot:
@@ -847,7 +841,7 @@ if __name__ == "__main__":
     # weekly_returns = pd.read_parquet(ROOT_DIR / "financial_data" / "all_etfs_rets.parquet.gzip")
     # algo = build_bot(weekly_returns=weekly_returns)
 
-    algo = LazyBot().algo
+    algo = initialize_bot()
 
     # algo = TradeBot()
 
