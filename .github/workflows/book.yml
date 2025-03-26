@@ -16,7 +16,7 @@ jobs:
       - name: "Build the virtual environment"
         uses: tschm/cradle/actions/environment@v0.1.56
 
-      - uses: cvxgrp/.github/actions/marimo@v2.2.8
+      - uses: tschm/cradle/actions/marimo@v0.1.56
         with:
           source_folder: book/marimo
 
@@ -26,7 +26,7 @@ jobs:
       - name: "Build the virtual environment"
         uses: tschm/cradle/actions/environment@v0.1.56
 
-      - uses: cvxgrp/.github/actions/pdoc@v2.2.8
+      - uses: tschm/cradle/actions/pdoc@v0.1.56
         with:
           source-folder: src/ifunnel
 
@@ -37,7 +37,7 @@ jobs:
       - name: "Build the virtual environment"
         uses: tschm/cradle/actions/environment@v0.1.56
 
-      - uses: cvxgrp/.github/actions/coverage@v2.2.8
+      - uses: tschm/cradle/actions/coverage@v0.1.56
         with:
           tests-folder: src/tests
           source-folder: src/ifunnel
@@ -49,7 +49,7 @@ jobs:
       - name: "Build the virtual environment"
         uses: tschm/cradle/actions/environment@v0.1.56
 
-      - uses: cvxgrp/.github/actions/jupyter@v2.2.8
+      - uses: tschm/cradle/actions/jupyter@v0.1.56
 
   book:
     runs-on: "ubuntu-latest"
