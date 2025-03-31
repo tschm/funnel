@@ -41,7 +41,7 @@ jobs:
         with:
           tests-folder: src/tests
           source-folder: src/ifunnel
-          coveralls: 'false'
+          coveralls: false
 
   jupyter:
     runs-on: "ubuntu-latest"
