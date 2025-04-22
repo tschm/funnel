@@ -1,4 +1,5 @@
 import subprocess
+import sys
 
 
 def test_notebooks(root_dir):
@@ -12,7 +13,7 @@ def test_notebooks(root_dir):
     for py_file in py_files:
         print(f"Running {py_file.name}...")
         result = subprocess.run(
-            ["python", str(py_file)], capture_output=True, text=True
+            [sys.executable, str(py_file)], capture_output=True, text=True
         )
 
         # Print the result of running the Python file
