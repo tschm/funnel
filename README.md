@@ -7,7 +7,6 @@
 [![Created with qCradle](https://img.shields.io/badge/Created%20with-qCradle-blue?style=flat-square)](https://github.com/tschm/package)
 [![CodeFactor](https://www.codefactor.io/repository/github/tschm/funnel/badge)](https://www.codefactor.io/repository/github/tschm/funnel)
 
-
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/tschm/funnel)
 
 ## Getting Started
