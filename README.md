@@ -1,4 +1,4 @@
-# [funnel](https://tschm.github.io/funnel/book)
+# 🌪️ [funnel](https://tschm.github.io/funnel/book)
 
 [![PyPI version](https://badge.fury.io/py/funnel.svg)](https://badge.fury.io/py/funnel)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
@@ -8,7 +8,7 @@
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/tschm/funnel)
 
-## Getting Started
+## 🚀 Getting Started
 
 ```python
 >>> name="Thomas"
@@ -17,7 +17,7 @@
 Hello Thomas
 ```
 
-### **Set Up Environment**
+### 🔧 **Set Up Environment**
 
 ```bash
 make install
@@ -33,7 +33,7 @@ uv add/remove requests  # for main dependencies
 uv add/remove requests --dev  # for dev dependencies
 ```
 
-### **Configure Pre-commit Hooks**
+### ✅ **Configure Pre-commit Hooks**
 
 ```bash
 make fmt
@@ -41,19 +41,19 @@ make fmt
 
 Installs hooks to maintain code quality and formatting.
 
-### **Update Project Info**
+### 📝 **Update Project Info**
 
 - Edit `pyproject.toml` to update authors and email addresses
 - Configure GitHub Pages (branch: gh-pages) in repository settings
 
-## Development Commands
+## 🛠️ Development Commands
 
 ```bash
 make tests   # Run test suite
 make marimo  # Start Marimo notebooks
 ```
 
-## Contributing
+## 🤝 Contributing
 
 - Fork the repository
 - Create your feature branch (git checkout -b feature/amazing-feature)
@@ -61,7 +61,7 @@ make marimo  # Start Marimo notebooks
 - Push to the branch (git push origin feature/amazing-feature)
 - Open a Pull Request
 
-## Trusted publishing failure
+## ⚠️ Trusted publishing failure
 
 That's good news!
 

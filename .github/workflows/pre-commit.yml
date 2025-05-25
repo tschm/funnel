@@ -1,24 +1,29 @@
 name: pre-commit
 
+# This workflow runs code quality checks
+# It ensures code follows style guidelines and has no dependency issues
+
 on:
-  push:
+  push:  # Run workflow on every push to the repository
 
 permissions:
-  checks: write
-  contents: read
+  checks: write  # Needed to write check results
+  contents: read  # Read access to repository contents
 
 jobs:
   deptry:
+    # Check for dependency issues using deptry
     runs-on: ubuntu-latest
     steps:
       - name: "Build the virtual environment"
-        uses: tschm/cradle/actions/environment@v0.1.56
+        uses: tschm/cradle/actions/environment@v0.1.56  # Set up Python environment with dependencies
 
-      - uses: tschm/cradle/actions/deptry@v0.1.56
+      - uses: tschm/cradle/actions/deptry@v0.1.56  # Run deptry to check for dependency issues
         with:
-          source-folder: src/ifunnel
+          source-folder: src/ifunnel  # Source code to check
 
   pre-commit:
+    # Run pre-commit hooks to enforce code style and quality
     runs-on: ubuntu-latest
     steps:
-      - uses: tschm/cradle/actions/pre-commit@v0.1.56
+      - uses: tschm/cradle/actions/pre-commit@v0.1.56  # Run pre-commit hooks

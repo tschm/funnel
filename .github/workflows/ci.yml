@@ -1,7 +1,10 @@
 name: "ci"
 
+# This workflow runs continuous integration tests
+# It ensures the code works across different Python versions
+
 on:
-- push
+- push  # Run workflow on every push to the repository
 
 jobs:
   test:
@@ -10,16 +13,17 @@ jobs:
 
     strategy:
       matrix:
+        # Define the matrix of environments to test on
         os: [ ubuntu-latest ] #, windows-latest, macos-latest ]
-        python-version: [ '3.10', '3.11', '3.12', '3.13' ]
+        python-version: [ '3.10', '3.11', '3.12', '3.13' ]  # Test on multiple Python versions
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: "Build the virtual environment"
-        uses: tschm/cradle/actions/environment@v0.1.56
+        uses: tschm/cradle/actions/environment@v0.1.56  # Set up Python environment with dependencies
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}  # Use Python version from matrix
 
-      - uses: tschm/cradle/actions/test@v0.1.56
+      - uses: tschm/cradle/actions/test@v0.1.56  # Run tests with pytest
         with:
-          tests-folder: src/tests
+          tests-folder: src/tests  # Location of test files
