@@ -59,6 +59,9 @@ jobs:
     runs-on: "ubuntu-latest"
     needs: [test, pdoc, jupyter, marimo]
 
+    environment:
+      name: github-pages  # 👈 this is the critical missing piece
+      
     permissions:
       pages: write            # Permission to deploy to Pages
       id-token: write         # Permission to verify deployment origin
