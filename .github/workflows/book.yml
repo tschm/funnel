@@ -60,12 +60,9 @@ jobs:
     needs: [test, pdoc, jupyter, marimo]
 
     permissions:
-      contents: write
+      pages: write            # Permission to deploy to Pages
+      id-token: write         # Permission to verify deployment origin
 
     steps:
-      - name: Checkout [${{ github.repository }}]
-        uses: actions/checkout@v4
-
       - name: Upload the book
-        if: ${{ env.ACT != 'true' }}  # Skip if running with 'act'
         uses: tschm/cradle/actions/book@v0.1.69
