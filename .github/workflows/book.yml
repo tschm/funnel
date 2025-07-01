@@ -55,5 +55,5 @@ jobs:
           title: 'Funnel'
           links: |
             {
-              "API": "./pdoc/index.html
+              "API": "./pdoc/index.html"
             }
