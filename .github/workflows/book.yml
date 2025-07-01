@@ -14,16 +14,6 @@ permissions:
 
 jobs:
 
-  marimo:
-    runs-on: "ubuntu-latest"
-    steps:
-      - name: "Build the virtual environment"
-        uses: tschm/cradle/actions/environment@v0.1.73
-
-      - uses: Jebel-Quant/marimushka@v0.1.2
-        with:
-          source_folder: book/marimo
-
   pdoc:
     runs-on: "ubuntu-latest"
     steps:
@@ -49,7 +39,7 @@ jobs:
 
   book:
     runs-on: "ubuntu-latest"
-    needs: [test, pdoc, marimo]
+    needs: [test, pdoc]
 
     environment:
       name: github-pages  # 👈 this is the critical missing piece
