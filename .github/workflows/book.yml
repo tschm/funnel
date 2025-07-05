@@ -18,9 +18,9 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Build the virtual environment"
-        uses: tschm/cradle/actions/environment@v0.1.75
+        uses: tschm/cradle/actions/environment@v0.1.80
 
-      - uses: tschm/cradle/actions/pdoc@v0.1.75
+      - uses: tschm/cradle/actions/pdoc@v0.1.80
         with:
           source-folder: src/ifunnel
 
@@ -29,9 +29,9 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Build the virtual environment"
-        uses: tschm/cradle/actions/environment@v0.1.75
+        uses: tschm/cradle/actions/environment@v0.1.80
 
-      - uses: tschm/cradle/actions/coverage@v0.1.75
+      - uses: tschm/cradle/actions/coverage@v0.1.80
         with:
           tests-folder: src/tests
           source-folder: src/ifunnel
@@ -50,7 +50,7 @@ jobs:
 
     steps:
       - name: Upload the book
-        uses: tschm/cradle/actions/book@v0.1.75
+        uses: tschm/cradle/actions/book@v0.1.80
         with:
           title: 'Funnel'
           links: |
