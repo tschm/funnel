@@ -1,4 +1,4 @@
-# [funnel](https://tschm.github.io/funnel/book)
+# [funnel](https://tschm.github.io/funnel)
 
 [![PyPI version](https://badge.fury.io/py/funnel.svg)](https://badge.fury.io/py/funnel)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
