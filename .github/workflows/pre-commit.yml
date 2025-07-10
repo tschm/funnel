@@ -1,24 +1,27 @@
 name: pre-commit
 
+# This workflow runs code quality checks and dependency analysis
+# It helps maintain code quality and identify dependency issues early
 on:
-  push:
+  push:  # Trigger the workflow on any push to the repository
 
 permissions:
-  checks: write
-  contents: read
+  checks: write    # Permission to create check runs for results
+  contents: read   # Permission to read repository contents
 
 jobs:
+  # Job to analyze dependencies and detect issues
   deptry:
     runs-on: ubuntu-latest
     steps:
-      - name: "Build the virtual environment"
-        uses: tschm/cradle/actions/environment@v0.3.01
-
       - uses: tschm/cradle/actions/deptry@v0.3.01
         with:
           source-folder: src/ifunnel
+        # Runs deptry to detect dependency issues like unused or missing imports
 
+  # Job to run pre-commit hooks for code quality checks
   pre-commit:
     runs-on: ubuntu-latest
     steps:
       - uses: tschm/cradle/actions/pre-commit@v0.3.01
+        # Runs pre-commit hooks defined in .pre-commit-config.yaml

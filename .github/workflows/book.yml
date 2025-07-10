@@ -1,5 +1,7 @@
 name: "book"
 
+# This workflow is responsible for generating and publishing documentation for the project
+# It creates API documentation, runs tests with coverage, and combines these into a book
 # Trigger the workflow on push events
 # This ensures the documentation is automatically updated whenever code changes are pushed to main
 on:
@@ -9,40 +11,47 @@ on:
 
 
 permissions:
-    checks: write
-    contents: read
+    checks: write    # Permission to create check runs for test results
+    contents: read   # Permission to read repository contents
 
 jobs:
 
+  # Job to generate API documentation using pdoc
   pdoc:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Build the virtual environment"
         uses: tschm/cradle/actions/environment@v0.3.01
+        # Sets up Python environment with all dependencies
 
       - uses: tschm/cradle/actions/pdoc@v0.3.01
         with:
           source-folder: src/ifunnel
+          # Generates API documentation for the ifunnel package
 
 
+  # Job to run tests and generate coverage reports
   test:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Build the virtual environment"
         uses: tschm/cradle/actions/environment@v0.3.01
+        # Sets up Python environment with all dependencies
 
       - uses: tschm/cradle/actions/coverage@v0.3.01
         with:
           tests-folder: src/tests
           source-folder: src/ifunnel
           coveralls: false
+          # Runs tests and generates coverage reports
 
+  # Job to combine documentation and test results into a book and publish it
   book:
     runs-on: "ubuntu-latest"
-    needs: [test, pdoc]
+    needs: [test, pdoc]  # This job depends on the completion of test and pdoc jobs
 
     environment:
-      name: github-pages  # 👈 this is the critical missing piece
+      name: github-pages  # Specifies the GitHub Pages environment for deployment
 
     permissions:
       pages: write            # Permission to deploy to Pages
