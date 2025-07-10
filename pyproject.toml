@@ -3,7 +3,7 @@ name = 'ifunnel'
 version = "0.0.0"
 description = "Backend for the investment-funnel"
 # Please add authors and correct the email...
-authors = [{name='Thomas Schmelzer', email= 'thomas.schmelzer@gmaili.com'},
+authors = [{name='Thomas Schmelzer', email= 'thomas.schmelzer@gmail.com'},
            {name="Petr Vanek", email="abc@gmail.com"}
 ]
 readme = "README.md"
