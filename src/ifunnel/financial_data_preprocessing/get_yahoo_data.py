@@ -1,3 +1,10 @@
+"""Module for downloading financial data from Yahoo Finance.
+
+This module provides functions to download historical price data for ETFs and
+other financial instruments from Yahoo Finance using the yfinance library.
+It handles data retrieval, error handling, and basic preprocessing.
+"""
+
 import os
 
 import pandas as pd
@@ -5,11 +12,26 @@ import yfinance as yf
 from loguru import logger
 
 
-def download_data(start_date: str, end_date: str, tickers: list[str]) -> pd.DataFrame:
-    """
-    Function to download all needed ETF data for NORD and Lysa portfolios
-    """
+def download_data(start_date: str, end_date: str, tickers: list[str]) -> pd.DataFrame | None:
+    """Download historical adjusted close price data for specified tickers.
 
+    This function retrieves historical price data from Yahoo Finance for a list
+    of ticker symbols between the specified date range. It handles potential
+    download errors and returns the adjusted close prices.
+
+    Args:
+        start_date: Start date for data retrieval in 'YYYY-MM-DD' format
+        end_date: End date for data retrieval in 'YYYY-MM-DD' format
+        tickers: List of ticker symbols to download data for
+
+    Returns:
+        Optional[pd.DataFrame]: DataFrame containing adjusted close prices with
+                               dates as index and tickers as columns, or None
+                               if the download fails
+
+    Raises:
+        No exceptions are raised as errors are caught and logged
+    """
     # Download price data from Yahoo! finance based on list of ETF tickers and start/end dates
     try:
         daily_prices = yf.download(tickers, start=start_date, end=end_date)["Adj Close"]
