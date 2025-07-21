@@ -11,8 +11,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ifunnel.models.MST import minimum_spanning_tree
-from ifunnel.models.ScenarioGeneration import MomentGenerator, ScenarioGenerator
+from ifunnel.models.mst import minimum_spanning_tree
+from ifunnel.models.scenario_generation import MomentGenerator, ScenarioGenerator
 
 
 @pytest.fixture(scope="module", name="root_dir")

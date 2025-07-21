@@ -1,13 +1,31 @@
+"""Module for Mean-Variance Optimization (MVO) target generation.
+
+This module provides functions for calculating volatility targets for portfolio
+optimization using the Mean-Variance approach. It computes targets based on
+equally-weighted portfolios and generates benchmark portfolio values for comparison.
+"""
+
 import numpy as np
 import pandas as pd
 from loguru import logger
 
-from .ScenarioGeneration import MomentGenerator
+from .scenario_generation import MomentGenerator
 
 
 # FUNCTION RUNNING THE OPTIMIZATION
 # ----------------------------------------------------------------------
-def portfolio_risk_target(covariance: np.array) -> float:
+def portfolio_risk_target(covariance: np.ndarray) -> float:
+    """Calculate the volatility of an equally-weighted portfolio.
+
+    This function computes the volatility (standard deviation) of a portfolio
+    where assets are weighted equally, based on the provided covariance matrix.
+
+    Args:
+        covariance: Covariance matrix of asset returns as a numpy array
+
+    Returns:
+        float: Portfolio volatility (standard deviation of returns)
+    """
     # Fixed equal weight x
     n = covariance.shape[0]
     x = np.ones(n) / n
@@ -22,8 +40,25 @@ def portfolio_risk_target(covariance: np.array) -> float:
 # Mathematical Optimization: TARGETS GENERATION
 # ----------------------------------------------------------------------
 def get_mvo_targets(
-    test_date: str, benchmark: list, budget: int, data: pd.DataFrame
+    test_date: str, benchmark: list[str], budget: int, data: pd.DataFrame
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Generate volatility targets and benchmark portfolio values for optimization.
+
+    This function generates Mean-Variance Optimization (MVO) volatility targets
+    for portfolio optimization and calculates the benchmark portfolio values over time.
+    It uses the covariance matrices generated for each period to compute the targets.
+
+    Args:
+        test_date: Start date for the testing period in string format
+        benchmark: List of ticker symbols for the benchmark portfolio
+        budget: Initial budget for the portfolio
+        data: DataFrame containing historical returns data
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing two DataFrames:
+            - targets: DataFrame with volatility targets for each period
+            - portfolio_value: DataFrame with benchmark portfolio values over time
+    """
     logger.info(f"🎯 Generating Volatility targets for {benchmark}")
 
     # Define Benchmark

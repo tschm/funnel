@@ -10,8 +10,8 @@ from datetime import timedelta
 import pandas as pd
 import pytest
 
-from ifunnel.models.MVOmodel import mvo_model
-from ifunnel.models.MVOtargets import get_mvo_targets
+from ifunnel.models.mvo_model import mvo_model
+from ifunnel.models.mvo_targets import get_mvo_targets
 
 
 @pytest.fixture(scope="module")

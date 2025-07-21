@@ -1,15 +1,34 @@
+"""Model functions for the lifecycle of a portfolio."""
+
 import cvxpy as cp
 import numpy as np
 import pandas as pd
 from loguru import logger
 
-from ..MVOmodel import cholesky_psd
+from ..mvo_model import cholesky_psd
 
 
 def calculate_risk_metrics(
     yearly_returns: pd.Series, risk_free_rate: float = 0.02
-) -> (float, float, float, float, float):
-    """Calculate risk metrics for a given set of yearly returns."""
+) -> tuple[float, float, float, float, float]:
+    """Calculate risk metrics for a given set of yearly returns.
+
+    This function computes various risk and performance metrics based on a series
+    of yearly returns, including annual return, standard deviation, Sharpe ratio,
+    downside deviation, and Sortino ratio.
+
+    Args:
+        yearly_returns: Series containing yearly investment returns
+        risk_free_rate: Annual risk-free rate used for Sharpe and Sortino calculations
+
+    Returns:
+        Tuple containing:
+            - annual_return: Mean annual return
+            - annual_std_dev: Standard deviation of annual returns
+            - sharpe_ratio: Sharpe ratio (excess return per unit of risk)
+            - downside_std_dev: Standard deviation of negative returns only
+            - sortino_ratio: Sortino ratio (excess return per unit of downside risk)
+    """
     annual_return = yearly_returns.mean()
     annual_std_dev = yearly_returns.std()
 
@@ -70,9 +89,9 @@ def lifecycle_rebalance_model(
     inaccurate: bool = True,
     lower_bound: float = 0,
 ) -> (pd.Series, float):
-    """
-    Optimizes asset allocations within a portfolio to maximize expected returns
-    while adhering to a risk budget glide path.
+    """Optimize asset allocations within a portfolio to maximize expected returns.
+
+    All while adhering to a risk budget glide path.
 
     Parameters:
     - mu: Expected returns for each asset.
@@ -91,31 +110,30 @@ def lifecycle_rebalance_model(
     and portfolio volatility. It optionally includes binary selection variables to enforce
     a minimum allocation to any selected asset.
     """
-
     # Prepare basic variables and indices
-    N = len(mu)  # Number of assets
+    n = len(mu)  # Number of assets
     cash_index = mu.index.get_loc("Cash")  # Identify the index of the 'Cash' asset
     non_cash_indices = np.array([i for i in range(len(mu)) if i != cash_index])
 
     # Optimization variables
-    x = cp.Variable(N, name="x", nonneg=True)  # Asset weights
+    x = cp.Variable(n, name="x", nonneg=True)  # Asset weights
 
     # Prepare matrix for volatility constraint
-    G = cholesky_psd(sigma)  # Transform to standard deviation matrix
+    g = cholesky_psd(sigma)  # Transform to standard deviation matrix
 
     # Define the optimization problem
     objective = cp.Maximize(x.T @ mu)
 
     constraints = [
         cp.sum(x) == 1,  # Weights sum to 1
-        cp.norm(G @ x, 2) <= vol_target,  # Portfolio volatility constraint
+        cp.norm(g @ x, 2) <= vol_target,  # Portfolio volatility constraint
         # cp.quad_form(x, sigma) <= vol_target ** 2,
         x[non_cash_indices] <= max_weight * cp.sum(x[non_cash_indices]),  # Max weight constraint for non-cash assets
     ]
 
     # Optional lower bound constraint
     if lower_bound != 0:
-        z = cp.Variable(N, boolean=True)  # Binary variable indicates if asset is selected
+        z = cp.Variable(n, boolean=True)  # Binary variable indicates if asset is selected
         upper_bound = 100  # Arbitrary upper bound for asset weights
 
         constraints += [
@@ -155,18 +173,14 @@ def get_port_allocations(
     max_weight: float,
     solver: str,
 ) -> pd.DataFrame:
-    """
-    Calculates optimal portfolio allocations for the glide paths.
+    """Calculate optimal portfolio allocations for the glide paths.
 
     Parameters:
-    - mu_lst, sigma_lst: Expected returns and standard deviations for each year
+    - mu_lst: Expected returns for each asset
+    - sigma_lst: Covariance matrix of asset returns
     - targets: Target volatilities from the risk budget glide paths
-    - budget: Initial budget
-    - trans_cost: Transaction costs
     - max_weight: Maximum weight for any asset
-    - withdrawal_lst: List of withdrawals for each year
     - solver: Optimization solver to use
-    - interest_rate: Interest rate for borrowing
 
     Returns:
     - allocation_df: DataFrame showing the optimal asset allocations for each year.
@@ -205,8 +219,9 @@ def portfolio_rebalancing(
     scenarios: pd.DataFrame,
     interest_rate: float,
 ) -> (pd.DataFrame, pd.DataFrame):
-    """
-    Simulates portfolio rebalancing over multiple years, accounting for withdrawals,
+    """Simulate portfolio rebalancing over multiple years.
+
+    Also account for withdrawals,
     transaction costs, returns based on scenarios, and handling defaults when withdrawals exceed portfolio value.
 
     Parameters:
@@ -221,7 +236,6 @@ def portfolio_rebalancing(
     - ptf_performance: DataFrame for portfolio performance for each year.
     - allocation_df: DataFrame showing asset allocations for each year.
     """
-
     # Initialize the number of years and assets from the targets DataFrame
     n_years, n_assets = targets.shape
     years = [i + 2023 for i in range(n_years)]
@@ -322,9 +336,10 @@ def riskadjust_model_scen(
     trans_cost: float,
     withdrawal_lst: list[float],
     interest_rate: float,
-) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
-    """
-    Simulates portfolio performance across different scenarios, adjusting for risk and calculating
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Simulate portfolio performance across different scenarios.
+
+    Adjusting for risk and calculating
     various financial metrics based on the portfolio's rebalancing strategy.
 
     Parameters:
@@ -338,13 +353,12 @@ def riskadjust_model_scen(
     Returns:
     - portfolio_df: DataFrame summarizing the performance metrics for each scenario.
     - mean_allocations_df: DataFrame showing the average asset allocations across all scenarios for each period.
-    - analysis_metrics: Dictionary containing overall analysis metrics calculated from portfolio_df.
+    - analysis_metrics: DataFrame containing overall analysis metrics calculated from portfolio_df.
 
     The function iterates through each scenario, rebalances the portfolio according to the targets,
     and calculates performance metrics such as total returns, costs, withdrawals, and risk-adjusted measures.
     It also tracks the occurrence of default events and calculates average allocations and other analysis metrics.
     """
-
     s_points, p_points, a_points = scen.shape  # Scenario, periods, and assets dimensions
     assets = targets.columns  # Asset names from the targets DataFrame
 

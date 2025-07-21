@@ -1,3 +1,10 @@
+"""Module for hierarchical clustering of financial assets.
+
+This module provides functions for clustering financial assets based on their correlation,
+visualizing the clustering through dendrograms, and selecting representative assets from
+each cluster based on performance criteria like Sharpe ratio.
+"""
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from loguru import logger
@@ -6,9 +13,7 @@ from scipy.spatial.distance import squareform
 
 
 def fancy_dendrogram(*args, **kwargs):
-    """
-    FUNCTION TO CREATE DENDROGRAM
-    """
+    """FUNCTION TO CREATE DENDROGRAM."""
     max_d = kwargs.pop("max_d", None)
     if max_d and "color_threshold" not in kwargs:
         kwargs["color_threshold"] = max_d
@@ -26,7 +31,7 @@ def fancy_dendrogram(*args, **kwargs):
             if y > annotate_above:
                 plt.plot(x, y, "o", c=c)
                 plt.annotate(
-                    "%.3g" % y,
+                    f"{y:.3g}",
                     (x, y),
                     xytext=(0, -5),
                     textcoords="offset points",
@@ -39,8 +44,19 @@ def fancy_dendrogram(*args, **kwargs):
 
 
 def cluster(data: pd.DataFrame, n_clusters: int, dendrogram: bool = False) -> pd.DataFrame:
-    """
-    FUNCTION TO CLUSTER DATA
+    """Performs hierarchical clustering on financial data.
+
+    This function clusters financial assets based on their Spearman correlation distance.
+    It uses complete linkage hierarchical clustering and can optionally display a dendrogram
+    visualization of the clustering.
+
+    Args:
+        data: DataFrame containing financial time series data, typically returns.
+        n_clusters: Number of clusters to form.
+        dendrogram: If True, displays a dendrogram visualization of the clustering.
+
+    Returns:
+        pd.DataFrame: DataFrame with the cluster assignments for each asset.
     """
     logger.info("💡 Running hierarchical clustering method")
 
@@ -86,8 +102,22 @@ def cluster(data: pd.DataFrame, n_clusters: int, dendrogram: bool = False) -> pd
 
 
 def pick_cluster(data: pd.DataFrame, stat: pd.DataFrame, ml: pd.DataFrame, n_assets: int) -> (list, pd.DataFrame):
-    """
-    METHOD TO PICK ASSETS FROM A CLUSTER BASED ON PERFORMANCE CRITERIA
+    """Selects representative assets from each cluster based on performance criteria.
+
+    This function selects a specified number of assets from each cluster based on their
+    Sharpe ratio. If a cluster has fewer assets than requested, it selects all available
+    assets from that cluster.
+
+    Args:
+        data: DataFrame containing the original financial data.
+        stat: DataFrame containing statistical metrics for each asset.
+        ml: DataFrame containing cluster assignments for each asset.
+        n_assets: Number of assets to select from each cluster.
+
+    Returns:
+        tuple: A tuple containing:
+            - list: List of selected asset identifiers.
+            - pd.DataFrame: DataFrame containing the returns data for the selected assets.
     """
     test = pd.concat([stat, ml], axis=1)
     # For each cluster find the asset with the highest Sharpe ratio

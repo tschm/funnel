@@ -1,3 +1,11 @@
+"""Module for Mean-Variance Optimization (MVO) portfolio modeling.
+
+This module provides functions for portfolio optimization using the Mean-Variance
+Optimization approach. It includes methods for computing Cholesky decomposition,
+rebalancing portfolios with transaction costs, and running the MVO model over
+multiple periods to generate optimal portfolio allocations.
+"""
+
 import pickle
 
 import cvxpy as cp
@@ -8,8 +16,20 @@ from loguru import logger
 
 
 def cholesky_psd(m):
-    """
-    Computes the Cholesky decomposition of the given matrix, that is not positive definite, only semidefinite.
+    """Computes the Cholesky decomposition for positive semidefinite matrices.
+
+    This function performs a Cholesky decomposition on matrices that may not be
+    positive definite, but are at least positive semidefinite. It uses LDL decomposition
+    and applies a fix for non-positive eigenvalues if necessary.
+
+    Args:
+        m: Input matrix to decompose, should be symmetric and positive semidefinite.
+
+    Returns:
+        numpy.ndarray: The Cholesky factor C such that C.T @ C approximates the input matrix.
+
+    Raises:
+        AssertionError: If the D matrix from LDL decomposition is not diagonal.
     """
     lu, d, perm = sp.linalg.ldl(m)
     assert np.max(np.abs(d - np.diag(np.diag(d)))) < 1e-12, "Matrix 'd' is not diagonal!"
@@ -20,8 +40,8 @@ def cholesky_psd(m):
         d -= 5 * min_eig * np.eye(*d.shape)
 
     sqrtd = sp.linalg.sqrtm(d)
-    C = (lu @ sqrtd).T
-    return C
+    c = (lu @ sqrtd).T
+    return c
 
 
 # ----------------------------------------------------------------------
@@ -39,53 +59,50 @@ def rebalancing_model(
     inaccurate,
     lower_bound,
 ):
-    """This function finds the optimal enhanced index portfolio according to some benchmark.
-    The portfolio corresponds to the tangency portfolio where risk is evaluated according to
-    the volatility of the tracking error. The model is formulated using quadratic programming.
+    """Finds the optimal enhanced index portfolio according to a benchmark.
 
-    Parameters
-    ----------
-    mu : pandas.Series with float values
-        asset point forecast
-    covariance : pandas.DataFrame with covariances
-        Asset covariances
-    vty_target:
-        targets for our optimal portfolio
-    cash:
-        additional budget for our portfolio
-    x_old:
-        old portfolio allocation
-    trans_cost:
-        transaction costs
-    max_weight : float
-        Maximum allowed weight
-    solver: str
-        The name of the solver to use, as returned by cvxpy.installed_solvers()
-    inaccurate: bool
-        Whether to also use solution with status "optimal_inaccurate"
-    lower_bound: int
-        Minimum weight given to each selected asset.
+    This function optimizes a portfolio to maximize expected return while respecting
+    volatility constraints and transaction costs. The portfolio corresponds to the
+    tangency portfolio where risk is evaluated according to the volatility of the
+    tracking error. The model is formulated using quadratic programming.
 
-    Returns
-    -------
-    float
-        Asset weights in an optimal portfolio
+    Args:
+        mu: pandas.Series with float values representing asset point forecasts.
+        covariance: pandas.DataFrame with asset covariances.
+        vty_target: Target volatility for the optimal portfolio.
+        cash: Additional budget for the portfolio.
+        x_old: Previous portfolio allocation.
+        trans_cost: Transaction costs as a fraction of traded value.
+        max_weight: Maximum allowed weight for any single asset.
+        solver: The name of the solver to use, as returned by cvxpy.installed_solvers().
+        inaccurate: Whether to also accept solutions with status "optimal_inaccurate".
+        lower_bound: Minimum weight given to each selected asset.
+
+    Returns:
+        tuple: A tuple containing:
+            - pd.Series: Optimal portfolio weights.
+            - float: Resulting portfolio volatility.
+            - float: Portfolio value.
+            - float: Remaining cash.
+
+    Raises:
+        Exception: If the solver does not find an optimal solution.
     """
     # Number of assets
-    N = covariance.shape[1]
+    n = covariance.shape[1]
 
     # Variable transaction costs
     c = trans_cost
 
     # Factorize the covariance
     # G = cholesky_psd(covariance)
-    G = np.linalg.cholesky(covariance)
+    g = np.linalg.cholesky(covariance)
 
     # Define variables
     # - portfolio
-    x = cp.Variable(N, name="x", nonneg=True)
+    x = cp.Variable(n, name="x", nonneg=True)
     # - |x - x_old|
-    absdiff = cp.Variable(N, name="absdiff", nonneg=True)
+    absdiff = cp.Variable(n, name="absdiff", nonneg=True)
     # - cost
     cost = cp.Variable(name="cost", nonneg=True)
 
@@ -95,7 +112,7 @@ def rebalancing_model(
     # Define constraints
     constraints = [
         # - Volatility limit
-        cp.norm(G @ x, 2) <= vty_target,
+        cp.norm(g @ x, 2) <= vty_target,
         # - Cost of rebalancing
         c * cp.sum(absdiff) == cost,
         x - x_old <= absdiff,
@@ -107,7 +124,7 @@ def rebalancing_model(
     ]
 
     if lower_bound != 0:
-        z = cp.Variable(N, boolean=True)  # Binary variable indicates if asset is selected
+        z = cp.Variable(n, boolean=True)  # Binary variable indicates if asset is selected
         upper_bound = 100
 
         constraints.append(lower_bound * z <= x)
@@ -130,7 +147,7 @@ def rebalancing_model(
         # Set floating data points to zero and normalize
         opt_port[np.abs(opt_port) < 0.000001] = 0
         port_val = np.sum(opt_port)
-        vty_result_p = np.linalg.norm(G @ x.value, 2) / port_val
+        vty_result_p = np.linalg.norm(g @ x.value, 2) / port_val
         opt_port = opt_port / port_val
 
         # Remaining cash
@@ -174,8 +191,29 @@ def mvo_model(
     lower_bound: int,
     inaccurate: bool = True,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """
-    Method to run the MVO model over given periods
+    """Runs the Mean-Variance Optimization model over multiple periods.
+
+    This function executes the MVO model for a sequence of investment periods,
+    rebalancing the portfolio at each period based on updated forecasts and targets.
+    It tracks portfolio allocations, values, and volatility over time.
+
+    Args:
+        test_ret: DataFrame containing asset returns for the test period.
+        mu_lst: List of expected return vectors (pandas.Series) for each period.
+        sigma_lst: List of covariance matrices (pandas.DataFrame) for each period.
+        targets: DataFrame containing volatility targets for each period.
+        budget: Initial budget for the portfolio.
+        trans_cost: Transaction costs as a fraction of traded value.
+        max_weight: Maximum allowed weight for any single asset.
+        solver: The name of the solver to use for optimization.
+        lower_bound: Minimum weight given to each selected asset.
+        inaccurate: Whether to accept solutions with status "optimal_inaccurate".
+
+    Returns:
+        tuple: A tuple containing three DataFrames:
+            - portfolio_allocation: Portfolio weights for each period.
+            - portfolio_value: Portfolio values over time.
+            - portfolio_vty: Portfolio volatility for each period.
     """
     p_points = len(mu_lst)  # number of periods
 
