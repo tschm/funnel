@@ -1,31 +1,51 @@
-"""Module for testing Python code blocks in the README.md file.
+"""Tests for validating code examples in the project documentation.
 
-This module extracts Python code blocks from the README.md file and runs them
-through doctest to ensure they execute correctly. This helps maintain the
-accuracy and functionality of code examples in the documentation.
+This file is part of the tschm/.config-templates repository
+(https://github.com/tschm/.config-templates).
+
+
+This module contains tests that extract Python code blocks from the README.md file
+and run them through doctest to ensure they are valid and working as expected.
+This helps maintain accurate and working examples in the documentation.
 """
 
 import doctest
 import os
 import re
+from pathlib import Path
 
 import pytest
+from _pytest.capture import CaptureFixture
+
+
+@pytest.fixture(scope="session", name="root_dir")
+def root_fixture() -> Path:
+    """Provide the path to the project root directory.
+
+    This fixture returns the absolute path to the root directory of the project,
+    which is useful for accessing files relative to the project root.
+
+    Returns:
+        Path: The absolute path to the project root directory
+
+    """
+    return Path(__file__).parent.parent.parent
 
 
 @pytest.fixture()
-def docstring(root_dir):
-    """Extract Python code blocks from README.md and format them for doctest.
+def docstring(root_dir: Path) -> str:
+    """Extract Python code blocks from README.md and prepare them for doctest.
 
     This fixture reads the README.md file, extracts all Python code blocks
     (enclosed in triple backticks with 'python' language identifier), and
-    formats them as a single docstring that can be processed by doctest.
+    combines them into a single docstring that can be processed by doctest.
 
     Args:
-        root_dir: Path to the project root directory.
+        root_dir: Path to the project root directory
 
     Returns:
-        str: A string containing all Python code blocks from README.md,
-             formatted as a docstring.
+        str: A docstring containing all Python code examples from README.md
+
     """
     # Read the README.md file
     with open(root_dir / "README.md") as f:
@@ -42,21 +62,27 @@ def docstring(root_dir):
     return docstring
 
 
-def test_blocks(root_dir, docstring, capfd):
-    """Test that Python code blocks in README.md execute without errors.
+def test_blocks(root_dir: Path, docstring: str, capfd: CaptureFixture[str]) -> None:
+    """Test that all Python code blocks in README.md execute without errors.
 
-    This function runs the Python code blocks extracted from README.md
-    through doctest to verify they execute correctly. It fails the test
-    if any errors or output are produced during execution.
+    This test runs all the Python code examples from the README.md file
+    through doctest to ensure they execute correctly. It captures any
+    output or errors and fails the test if any issues are detected.
 
     Args:
-        root_dir: Path to the project root directory.
-        docstring: String containing Python code blocks from README.md.
-        capfd: Pytest fixture for capturing stdout/stderr output.
+        root_dir: Path to the project root directory
+        docstring: String containing all Python code examples from README.md
+        capfd: Pytest fixture for capturing stdout/stderr output
+
+    Raises:
+        pytest.fail: If any doctest fails or produces unexpected output
+
     """
+    # Change to the root directory to ensure imports work correctly
     os.chdir(root_dir)
 
     try:
+        # Run the code examples through doctest
         doctest.run_docstring_examples(docstring, globals())
     except doctest.DocTestFailure as e:
         # If a DocTestFailure occurs, capture it and manually fail the test

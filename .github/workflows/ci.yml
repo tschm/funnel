@@ -1,30 +1,43 @@
-name: "ci"
+# This file is part of the tschm/.config-templates repository
+# (https://github.com/tschm/.config-templates).
+#
+# Workflow: Continuous Integration
+# Purpose: This workflow runs tests on multiple Python versions to ensure
+#          compatibility and code quality across different environments.
+#
+# Trigger: This workflow runs on every push
+#
+# Components:
+#   - 🧪 Run tests on multiple Python versions
+#   - 🔄 Matrix strategy for testing on different environments
 
-# This workflow is responsible for continuous integration testing
-# It runs tests on different Python versions to ensure compatibility
+name: "CI"
+
 on:
-- push  # Trigger the workflow on any push to the repository
+- push
+
+permissions:
+  contents: read
 
 jobs:
   test:
+    if: github.repository != 'tschm/.config-templates'
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        # Define the matrix of environments to test on
-        os: [ ubuntu-latest ] #, windows-latest, macos-latest ]
-        python-version: [ '3.10', '3.11', '3.12', '3.13' ]  # Test on multiple Python versions
+        # mongo container action only supported on Linux
+        os: [ ubuntu-latest ]
+        python-version: [ '3.11', '3.12', '3.13' ]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: "Build the virtual environment"
-        uses: tschm/cradle/actions/environment@v0.3.01
+      - name: "Build the virtual environment for ${{ github.repository }}"
+        uses: tschm/cradle/actions/environment@v0.3.04
         with:
           python-version: ${{ matrix.python-version }}
-        # Sets up Python environment with the specified Python version
 
-      - uses: tschm/cradle/actions/test@v0.3.01
+      - uses: tschm/cradle/actions/test@v0.3.04
         with:
           tests-folder: src/tests
-        # Runs the test suite to verify functionality
