@@ -1,3 +1,11 @@
+"""Module for Conditional Value at Risk (CVaR) portfolio optimization.
+
+This module provides functions for portfolio optimization using the Conditional
+Value at Risk (CVaR) approach. It includes methods for rebalancing portfolios
+with transaction costs and running the CVaR model over multiple periods to
+generate optimal portfolio allocations that satisfy risk constraints.
+"""
+
 import pickle
 
 import cvxpy as cp
@@ -10,71 +18,67 @@ from loguru import logger
 # MODEL FOR OPTIMIZING THE BACKTEST PERIODS
 # ----------------------------------------------------------------------
 def rebalancing_model(
-    mu,
-    scenarios,
-    cvar_targets,
-    cvar_alpha,
-    cash,
-    x_old,
-    trans_cost,
-    max_weight,
-    solver,
-    inaccurate,
-    lower_bound,
-):
-    """This function finds the optimal enhanced index portfolio according to some benchmark.
-    The portfolio corresponds to the tangency portfolio where risk is evaluated according to
-    the CVaR of the tracking error. The model is formulated using fractional programming.
+    mu: pd.Series,
+    scenarios: pd.DataFrame,
+    cvar_targets: float,
+    cvar_alpha: float,
+    cash: float,
+    x_old: pd.Series,
+    trans_cost: float,
+    max_weight: float,
+    solver: str,
+    inaccurate: bool,
+    lower_bound: int,
+) -> None | tuple[pd.Series, float, float, float]:
+    """Find the optimal portfolio that maximizes return subject to CVaR constraints.
 
-    Parameters
-    ----------
-    mu : pandas.Series with float values
-        asset point forecast
-    scenarios : pandas.DataFrame with float values
-        Asset scenarios
-    cvar_targets:
-        cvar targets for our optimal portfolio
-    cash:
-        additional budget for our portfolio
-    x_old:
-        old portfolio allocation
-    trans_cost:
-        transaction costs
-    max_weight : float
-        Maximum allowed weight
-    cvar_alpha : float
-        Alpha value used to evaluate Value-at-Risk one
-    solver: str
-        The name of the solver to use, as returned by cvxpy.installed_solvers()
-    inaccurate: bool
-        Whether to also use solution with status "optimal_inaccurate"
-    lower_bound: int
-        Minimum weight given to each selected asset.
+    This function optimizes a portfolio to maximize expected return while respecting
+    Conditional Value at Risk (CVaR) constraints and transaction costs. The portfolio
+    corresponds to the tangency portfolio where risk is evaluated according to the
+    CVaR of the tracking error. The model is formulated using convex optimization.
 
-    Returns
-    -------
-    float
-        Asset weights in an optimal portfolio
+    Args:
+        mu: Asset expected returns as a pandas Series
+        scenarios: DataFrame containing return scenarios for each asset
+        cvar_targets: Maximum allowed CVaR for the optimal portfolio
+        cvar_alpha: Alpha value used to evaluate CVaR (typically 0.05 for 95% confidence)
+        cash: Additional budget for the portfolio
+        x_old: Previous portfolio allocation as a pandas Series
+        trans_cost: Transaction costs as a fraction of traded value
+        max_weight: Maximum allowed weight for any single asset
+        solver: The name of the solver to use, as returned by cvxpy.installed_solvers()
+        inaccurate: Whether to also accept solutions with status "optimal_inaccurate"
+        lower_bound: Minimum weight given to each selected asset
+
+    Returns:
+        Optional[Tuple[pd.Series, float, float, float]]: If optimization succeeds, returns:
+            - pd.Series: Optimal portfolio weights
+            - float: Resulting portfolio CVaR
+            - float: Portfolio value
+            - float: Remaining cash
+        If optimization fails, returns None and logs an error
+
+    Raises:
+        No exceptions are raised as errors are caught and logged
     """
-
     # Define index
     i_idx = scenarios.columns
-    N = i_idx.size
+    n = i_idx.size
 
     # Number of scenarios
-    T = scenarios.shape[0]
+    t = scenarios.shape[0]
     # Variable transaction costs
     c = trans_cost
 
     # Define variables
     # - portfolio
-    x = cp.Variable(N, name="x", nonneg=True)
+    x = cp.Variable(n, name="x", nonneg=True)
     # - |x - x_old|
-    absdiff = cp.Variable(N, name="absdiff", nonneg=True)
+    absdiff = cp.Variable(n, name="absdiff", nonneg=True)
     # - cost
     cost = cp.Variable(name="cost", nonneg=True)
     # - loss deviation
-    vardev = cp.Variable(T, name="vardev", nonneg=True)
+    vardev = cp.Variable(t, name="vardev", nonneg=True)
     # - VaR and CVaR
     var = cp.Variable(name="var", nonneg=True)
     cvar = cp.Variable(name="cvar", nonneg=True)
@@ -87,7 +91,7 @@ def rebalancing_model(
         # - VaR deviation
         -scenarios.to_numpy() @ x - var <= vardev,
         # - CVaR limit
-        var + 1 / (T * cvar_alpha) * cp.sum(vardev) == cvar,
+        var + 1 / (t * cvar_alpha) * cp.sum(vardev) == cvar,
         cvar <= cvar_targets,
         # - Cost of rebalancing
         c * cp.sum(absdiff) == cost,
@@ -100,7 +104,7 @@ def rebalancing_model(
     ]
 
     if lower_bound != 0:
-        z = cp.Variable(N, boolean=True)  # Binary variable indicates if asset is selected
+        z = cp.Variable(n, boolean=True)  # Binary variable indicates if asset is selected
         upper_bound = 100
 
         constraints.append(lower_bound * z <= x)
@@ -165,10 +169,31 @@ def cvar_model(
     max_weight: float,
     solver: str,
     inaccurate: bool = True,
-    lower_bound=int,
+    lower_bound: int = 0,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """
-    Method to run the CVaR model over given periods
+    """Run the CVaR optimization model over multiple investment periods.
+
+    This function executes the CVaR model for a sequence of investment periods,
+    rebalancing the portfolio at each period based on updated scenarios and targets.
+    It tracks portfolio allocations, values, and CVaR over time.
+
+    Args:
+        test_ret: DataFrame containing asset returns for the test period
+        scenarios: 3D array of simulated returns with dimensions (periods, scenarios, assets)
+        targets: DataFrame containing CVaR targets for each period
+        budget: Initial budget for the portfolio
+        cvar_alpha: Alpha value used to evaluate CVaR (typically 0.05 for 95% confidence)
+        trans_cost: Transaction costs as a fraction of traded value
+        max_weight: Maximum allowed weight for any single asset
+        solver: The name of the solver to use for optimization
+        inaccurate: Whether to accept solutions with status "optimal_inaccurate"
+        lower_bound: Minimum weight given to each selected asset
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: A tuple containing:
+            - portfolio_allocation: Portfolio weights for each period
+            - portfolio_value: Portfolio values over time
+            - portfolio_cvar: Portfolio CVaR for each period
     """
     p_points, s_points, _ = scenarios.shape  # number of periods, number of scenarios
     prob = 1 / s_points  # probability of each scenario

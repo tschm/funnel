@@ -1,3 +1,11 @@
+"""Module for minimum spanning tree (MST) based asset selection.
+
+This module provides functions to select a diversified subset of financial assets
+using graph theory, specifically the minimum spanning tree algorithm. It identifies
+assets that are less correlated with each other, which is useful for portfolio
+diversification.
+"""
+
 import networkx as nx
 import numpy as np
 import pandas as pd
@@ -5,7 +13,24 @@ from loguru import logger
 from sklearn.decomposition import PCA
 
 
-def minimum_spanning_tree(dataset: pd.DataFrame) -> (list, pd.DataFrame, float, float):
+def minimum_spanning_tree(dataset: pd.DataFrame) -> tuple[list[str], pd.DataFrame, float, float]:
+    """Select a diversified subset of assets using minimum spanning tree algorithm.
+
+    This function constructs a graph where nodes are assets and edge weights are
+    distances based on correlation. It then computes a minimum spanning tree and
+    selects leaf nodes (degree 1) as the diversified subset of assets.
+
+    Args:
+        dataset: DataFrame containing financial time series data, typically returns,
+                with assets as columns and time periods as rows
+
+    Returns:
+        Tuple containing:
+            - List[str]: List of selected asset identifiers (leaf nodes)
+            - pd.DataFrame: DataFrame containing only the selected assets' data
+            - float: Average correlation among the selected assets
+            - float: Portfolio Diversification Index (PDI) for the selected assets
+    """
     logger.debug("💡 Running MST method")
 
     corr = dataset.corr(method="spearman")  # calculate the correlation

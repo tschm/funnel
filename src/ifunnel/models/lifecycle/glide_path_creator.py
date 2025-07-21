@@ -1,11 +1,32 @@
+"""Module for creating and visualizing risk budget glide paths for lifecycle investing.
+
+This module provides functions to generate different types of risk profiles (linear,
+concave, convex) for lifecycle investment strategies, where risk exposure typically
+decreases as an investor approaches retirement or another financial goal.
+"""
+
 import numpy as np
 import pandas as pd
 import plotly.express as px
 
 
-def generate_risk_profiles(n_periods: int, initial_risk: float, minimum_risk: float) -> (pd.DataFrame, px.line):
-    """Generate risk profiles for glide paths."""
+def generate_risk_profiles(n_periods: int, initial_risk: float, minimum_risk: float) -> tuple[pd.DataFrame, px.line]:
+    """Generate risk profiles for lifecycle investment glide paths.
 
+    This function creates three different risk profile patterns (linear, concave, and convex)
+    that show how investment risk should decrease over time. It also generates a
+    visualization of these profiles.
+
+    Args:
+        n_periods: Number of time periods to generate profiles for
+        initial_risk: Starting risk level (standard deviation) at the beginning of the glide path
+        minimum_risk: Ending risk level (standard deviation) at the end of the glide path
+
+    Returns:
+        Tuple containing:
+            - pd.DataFrame: DataFrame with the risk values for each period and profile type
+            - px.line: Plotly line chart visualizing the different risk profiles
+    """
     df = pd.DataFrame(index=range(n_periods))
     x_values = np.linspace(0, 1, n_periods)
 

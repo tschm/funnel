@@ -1,15 +1,36 @@
+"""Module for Conditional Value at Risk (CVaR) target generation and calculation.
+
+This module provides functions for calculating CVaR using the primal formula,
+computing portfolio risk targets, and generating CVaR targets for portfolio optimization.
+CVaR is a risk measure that quantifies the expected loss in the worst-case scenarios.
+"""
+
 import numpy as np
 import pandas as pd
 from loguru import logger
 
-from .ScenarioGeneration import ScenarioGenerator
+from .scenario_generation import ScenarioGenerator
 
 
 # Primal CVaR formula
-def CVaR(alpha: float, p: np.array, q: np.array) -> tuple[float, float]:
-    """
-    Computes CVaR using primal formula.
-    NOTE: Inputs p and q should be numpy arrays.
+def cvar(alpha: float, p: np.array, q: np.array) -> tuple[float, float]:
+    """Computes Conditional Value at Risk (CVaR) using the primal formula.
+
+    This function calculates both Value at Risk (VaR) and Conditional Value at Risk (CVaR)
+    for a given confidence level alpha and distribution of losses.
+
+    Args:
+        alpha: Confidence level, typically between 0.9 and 0.99.
+        p: Array of probabilities for each scenario.
+        q: Array of losses for each scenario.
+
+    Returns:
+        tuple: A tuple containing:
+            - float: Value at Risk (VaR) at the given confidence level.
+            - float: Conditional Value at Risk (CVaR) at the given confidence level.
+
+    Note:
+        Inputs p and q must be numpy arrays.
     """
     # We need to be careful that math index starts from 1 but numpy starts from 0
     # (matters in formulas like ceil(alpha * T))
@@ -34,6 +55,19 @@ def CVaR(alpha: float, p: np.array, q: np.array) -> tuple[float, float]:
 # FUNCTION RUNNING THE OPTIMIZATION
 # ----------------------------------------------------------------------
 def portfolio_risk_target(scenarios: pd.DataFrame, cvar_alpha: float) -> float:
+    """Calculates the CVaR risk target for an equally-weighted portfolio.
+
+    This function computes the Conditional Value at Risk (CVaR) for an equally-weighted
+    portfolio based on the provided scenarios. It assumes equal allocation across all
+    assets in the portfolio.
+
+    Args:
+        scenarios: DataFrame containing return scenarios for each asset.
+        cvar_alpha: Confidence level for CVaR calculation, typically between 0.9 and 0.99.
+
+    Returns:
+        float: The CVaR value for the equally-weighted portfolio.
+    """
     # Fixed equal weight x
     x = pd.Series(index=scenarios.columns, data=1 / scenarios.shape[1])
 
@@ -47,7 +81,7 @@ def portfolio_risk_target(scenarios: pd.DataFrame, cvar_alpha: float) -> float:
     probs = np.ones(scenario_n) / scenario_n
 
     # CVaR
-    _, portfolio_cvar = CVaR(1 - cvar_alpha, probs, losses)
+    _, portfolio_cvar = cvar(1 - cvar_alpha, probs, losses)
 
     return portfolio_cvar
 
@@ -64,6 +98,26 @@ def get_cvar_targets(
     scgen: ScenarioGenerator,
     n_simulations: int,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Generates CVaR targets and benchmark portfolio values for optimization.
+
+    This function generates Conditional Value at Risk (CVaR) targets for portfolio
+    optimization and calculates the benchmark portfolio values over time. It uses
+    bootstrapping to generate scenarios for risk calculation.
+
+    Args:
+        test_date: Start date for the testing period.
+        benchmark: List of ticker symbols for the benchmark portfolio.
+        budget: Initial budget for the portfolio.
+        cvar_alpha: Confidence level for CVaR calculation.
+        data: DataFrame containing historical returns data.
+        scgen: ScenarioGenerator instance for scenario generation.
+        n_simulations: Number of scenarios to generate.
+
+    Returns:
+        tuple: A tuple containing two DataFrames:
+            - targets: DataFrame with CVaR targets for each period.
+            - portfolio_value: DataFrame with benchmark portfolio values over time.
+    """
     logger.info(f"🎯 Generating CVaR targets for {benchmark}")
 
     # Define Benchmark

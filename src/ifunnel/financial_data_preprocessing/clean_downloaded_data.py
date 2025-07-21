@@ -1,11 +1,33 @@
+"""Module for cleaning and preprocessing financial data.
+
+This module provides functions to clean raw financial data from sources like
+Yahoo Finance, handle missing values, filter outliers, and transform daily
+price data into weekly returns suitable for portfolio optimization.
+"""
+
 import os
 
 import pandas as pd
 
 
-def clean_data(data_raw):
-    """
-    Function to clean raw data from Yahoo! finance and transform it into weekly returns
+def clean_data(data_raw: pd.DataFrame) -> pd.DataFrame | None:
+    """Clean raw financial data and transform it into weekly returns.
+
+    This function processes raw price data by:
+    1. Removing assets with incomplete data at the beginning or end
+    2. Filling missing daily prices with the closest future price
+    3. Removing outliers with daily returns exceeding 20%
+    4. Selecting Wednesday prices to compute weekly returns
+    5. Ensuring all Wednesdays have data by filling gaps
+    6. Computing percentage returns from prices
+
+    Args:
+        data_raw: DataFrame containing raw daily price data with dates as index
+                 and assets as columns
+
+    Returns:
+        Optional[pd.DataFrame]: DataFrame containing weekly returns, or None if
+                               the data is saved directly to a file
     """
     data_raw = data_raw.fillna("")
 

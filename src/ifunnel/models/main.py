@@ -1,3 +1,11 @@
+"""Main module for portfolio optimization and analysis.
+
+This module provides a trading bot interface for financial portfolio optimization
+and analysis. It integrates various optimization models, asset selection methods,
+and visualization tools to help users build and analyze diversified portfolios.
+The module supports backtesting, scenario analysis, and lifecycle investment modeling.
+"""
+
 from functools import lru_cache
 from itertools import cycle
 from math import ceil
@@ -12,19 +20,19 @@ from loguru import logger
 from plotly.subplots import make_subplots
 from scipy.stats import gaussian_kde
 
-from .Clustering import cluster, pick_cluster
-from .CVaRmodel import cvar_model
-from .CVaRtargets import get_cvar_targets
-from .dataAnalyser import final_stats, mean_an_returns
-from .lifecycle.glidePathCreator import generate_risk_profiles
-from .lifecycle.MVOlifecycleModel import (
+from .clustering import cluster, pick_cluster
+from .cvar_model import cvar_model
+from .cvar_targets import get_cvar_targets
+from .data_analyser import final_stats, mean_an_returns
+from .lifecycle.glide_path_creator import generate_risk_profiles
+from .lifecycle.mvo_lifecycle_model import (
     get_port_allocations,
     riskadjust_model_scen,
 )
-from .MST import minimum_spanning_tree
-from .MVOmodel import mvo_model
-from .MVOtargets import get_mvo_targets
-from .ScenarioGeneration import MomentGenerator, ScenarioGenerator
+from .mst import minimum_spanning_tree
+from .mvo_model import mvo_model
+from .mvo_targets import get_mvo_targets
+from .scenario_generation import MomentGenerator, ScenarioGenerator
 
 pio.renderers.default = "browser"
 
@@ -37,11 +45,23 @@ pio.renderers.default = "browser"
 
 
 @lru_cache(maxsize=1)  # Cache the result of this function
-def initialize_bot(file=None):
-    """Initialize and return the trading bot."""
+def initialize_bot(file: str | Path | None = None) -> "_TradeBot":
+    """Initialize and return a trading bot instance.
+
+    This function creates and returns a _TradeBot instance initialized with
+    financial data from the specified file. The result is cached to avoid
+    reloading the data unnecessarily.
+
+    Args:
+        file: Path to the parquet file containing financial return data.
+             If None, uses the default file in the financial_data directory.
+
+    Returns:
+        _TradeBot: An initialized trading bot instance ready for analysis.
+    """
     if file is None:
-        ROOT_DIR = Path(__file__).parent.parent
-        file = ROOT_DIR / "financial_data" / "all_etfs_rets.parquet.gzip"
+        root_dir = Path(__file__).parent.parent
+        file = root_dir / "financial_data" / "all_etfs_rets.parquet.gzip"
 
     weekly_returns = pd.read_parquet(file)
 
@@ -52,12 +72,28 @@ def initialize_bot(file=None):
 
 
 class _TradeBot:
-    """
-    Python class analysing financial products and based on machine learning algorithms and mathematical
-    optimization suggesting optimal portfolio of assets.
+    """Trading bot for financial portfolio optimization and analysis.
+
+    This class provides methods for analyzing financial assets, selecting diversified
+    subsets using machine learning algorithms, optimizing portfolios using various
+    mathematical models, and visualizing results. It supports:
+
+    - Asset performance analysis and visualization
+    - Diversification using minimum spanning tree and clustering algorithms
+    - Portfolio optimization with Mean-Variance and CVaR models
+    - Backtesting of optimization strategies
+    - Lifecycle investment modeling and scenario analysis
     """
 
-    def __init__(self, tickers, names, weekly_returns):
+    def __init__(self, tickers: list[str], names: list[str], weekly_returns: pd.DataFrame):
+        """Initialize the trading bot with financial data.
+
+        Args:
+            tickers: List of ticker symbols or identifiers for the assets
+            names: List of human-readable names corresponding to the tickers
+            weekly_returns: DataFrame containing weekly return data with dates as index
+                           and assets as columns
+        """
         self.tickers = tickers
         self.names = names
         self.weeklyReturns = weekly_returns
@@ -71,11 +107,27 @@ class _TradeBot:
         performance: pd.DataFrame,
         performance_benchmark: pd.DataFrame,
         composition: pd.DataFrame,
-        names: list,
-        tickers: list,
+        names: list[str],
+        tickers: list[str],
     ) -> tuple[px.line, go.Figure]:
-        """METHOD TO PLOT THE BACKTEST RESULTS"""
+        """Create performance and composition plots for backtest results.
 
+        This method generates two plots:
+        1. A line chart comparing the optimized portfolio performance against the benchmark
+        2. A stacked area chart showing the portfolio composition over time
+
+        Args:
+            performance: DataFrame with portfolio values over time
+            performance_benchmark: DataFrame with benchmark portfolio values over time
+            composition: DataFrame with portfolio weights for each asset over time
+            names: List of human-readable asset names
+            tickers: List of ticker symbols corresponding to the names
+
+        Returns:
+            Tuple containing:
+                - px.line: Line chart comparing portfolio and benchmark performance
+                - go.Figure: Stacked area chart showing portfolio composition over time
+        """
         performance.index = pd.to_datetime(performance.index.values, utc=True)
 
         # ** PERFORMANCE GRAPH **
@@ -154,8 +206,7 @@ class _TradeBot:
         tickers: list,
         names: list,
     ) -> tuple[go.Figure, dict[str, go.Figure], go.Figure]:
-        """METHOD TO PLOT THE LIFECYCLE SIMULATION RESULTS"""
-
+        """METHOD TO PLOT THE LIFECYCLE SIMULATION RESULTS."""
         # Define colors
         colors = [
             "#99A4AE",  # gray50
@@ -336,8 +387,7 @@ class _TradeBot:
         return fig, composition_figures, fig_subplots
 
     def get_stat(self, start_date: str, end_date: str) -> pd.DataFrame:
-        """METHOD COMPUTING ANNUAL RETURNS, ANNUAL STD. DEV. & SHARPE RATIO OF ASSETS"""
-
+        """METHOD COMPUTING ANNUAL RETURNS, ANNUAL STD. DEV. & SHARPE RATIO OF ASSETS."""
         # ANALYZE THE DATA for a given time period
         weekly_data = self.weeklyReturns[
             (self.weeklyReturns.index >= start_date) & (self.weeklyReturns.index <= end_date)
@@ -421,7 +471,7 @@ class _TradeBot:
         optimal_portfolio: list | None = None,
         benchmark: list | None = None,
     ) -> px.scatter:
-        """METHOD TO PLOT THE OVERVIEW OF THE FINANCIAL PRODUCTS IN TERMS OF RISK AND RETURNS"""
+        """METHOD TO PLOT THE OVERVIEW OF THE FINANCIAL PRODUCTS IN TERMS OF RISK AND RETURNS."""
         fund_set = fund_set if fund_set else []
         top_performers = top_performers if top_performers else []
 
@@ -532,7 +582,7 @@ class _TradeBot:
         return fig
 
     def mst(self, start_date: str, end_date: str, n_mst_runs: int, plot: bool = False):
-        """METHOD TO RUN MST METHOD AND PRINT RESULTS"""
+        """METHOD TO RUN MST METHOD AND PRINT RESULTS."""
         fig, subset_mst = None, []
 
         # Starting subset of data for MST
@@ -563,9 +613,7 @@ class _TradeBot:
         n_assets: int,
         plot: bool = False,
     ):
-        """
-        METHOD TO RUN MST METHOD AND PRINT RESULTS
-        """
+        """METHOD TO RUN MST METHOD AND PRINT RESULTS."""
         fig = None
         dataset = self.weeklyReturns[
             (self.weeklyReturns.index >= start_date) & (self.weeklyReturns.index <= end_date)
@@ -606,8 +654,7 @@ class _TradeBot:
         solver: str = "CLARABEL",
         lower_bound: int = 0,
     ) -> tuple[pd.DataFrame, pd.DataFrame, px.line, go.Figure]:
-        """METHOD TO COMPUTE THE BACKTEST"""
-
+        """METHOD TO COMPUTE THE BACKTEST."""
         # Find Benchmarks' ISIN codes
         benchmark_isin = [self.tickers[list(self.names).index(name)] for name in benchmarks]
 
@@ -725,8 +772,7 @@ class _TradeBot:
         rng_seed=0,
         test_split: float = False,
     ) -> tuple[dict, pd.DataFrame, go.Figure, go.Figure, dict, dict, go.Figure]:
-        """METHOD TO COMPUTE THE LIFECYCLE SCENARIO ANALYSIS"""
-
+        """METHOD TO COMPUTE THE LIFECYCLE SCENARIO ANALYSIS."""
         # ------------------------------- INITIALIZE FUNCTION -------------------------------
         n_periods = end_year - 2023
         withdrawal_lst = [withdrawals * (1 + 0.04) ** i for i in range(n_periods)]
@@ -752,7 +798,7 @@ class _TradeBot:
             sg = ScenarioGenerator(np.random.default_rng(rng_seed))
 
         if scenarios_type == "MonteCarlo":
-            scenarios = sg.MC_simulation_annual_from_weekly(
+            scenarios = sg.mc_simulation_annual_from_weekly(
                 weekly_mu=mu_weekly,
                 weekly_sigma=sigma_weekly,
                 n_simulations=n_simulations,

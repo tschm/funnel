@@ -1,4 +1,5 @@
-# THE ETF LIST TO DIVERSIFY BETWEEN MUTUAL FUNDS AND ETFs
+"""THE ETF LIST TO DIVERSIFY BETWEEN MUTUAL FUNDS AND ETFs."""
+
 # ------------------------------------------------------------------
 ETFlist = [
     "IE00BJYM1X45",

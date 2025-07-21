@@ -1,3 +1,10 @@
+"""Module for generating financial scenarios and computing statistical moments.
+
+This module provides classes and methods for generating financial scenarios using
+Monte Carlo simulation and bootstrapping techniques, as well as computing statistical
+moments like mean and covariance matrices with various shrinkage methods.
+"""
+
 import math
 
 import numpy as np
@@ -7,52 +14,56 @@ from sklearn.covariance import MinCovDet
 
 
 class MomentGenerator:
-    """
-    Provides methods for mean, variance generation.
-    """
+    """Provides methods for mean, variance generation."""
 
     @staticmethod
-    def _alpha_numerator(Z, S):
+    def _alpha_numerator(zz, ss):
+        """Computes the numerator for the Ledoit-Wolf shrinkage coefficient.
+
+        Parameters:
+            zz: Centered data matrix.
+            ss: Sample covariance matrix.
+
+        Returns:
+            float: The numerator value for the shrinkage coefficient calculation.
+        """
         s = 0
-        T = Z.shape[1]
-        for k in range(T):
-            z = Z[:, k][:, np.newaxis]
-            X = z @ z.T - S
-            s += np.trace(X @ X)
-        s /= T**2
+        t = zz.shape[1]
+        for k in range(t):
+            z = zz[:, k][:, np.newaxis]
+            x = z @ z.T - ss
+            s += np.trace(x @ x)
+        s /= t**2
         return s
 
     @staticmethod
-    def _ledoit_wolf_shrinkage(X, S):
-        """
-        Computes the Ledoit--Wolf shrinkage, using a target of scaled identity.
-        """
-        N = len(X.columns)
+    def _ledoit_wolf_shrinkage(x, s):
+        """Computes the Ledoit--Wolf shrinkage, using a target of scaled identity."""
+        n = len(x.columns)
         # In case only one asset in the matrix, for example for benchmark with one asset, no shrinkage is needed
-        if N == 1:
-            return S
+        if n == 1:
+            return s
 
         # Center the data
-        X = (X - X.mean(0)).to_numpy().T
+        x = (x - x.mean(0)).to_numpy().T
 
         # Target.
-        s_avg2 = np.trace(S) / N
-        B = s_avg2 * np.eye(N)
+        s_avg2 = np.trace(s) / n
+        b = s_avg2 * np.eye(n)
 
         # Shrinkage coefficient.
-        alpha_num = MomentGenerator._alpha_numerator(X, S)
-        alpha_den = np.trace((S - B) @ (S - B))
+        alpha_num = MomentGenerator._alpha_numerator(x, s)
+        alpha_den = np.trace((s - b) @ (s - b))
         alpha = alpha_num / alpha_den
 
         # Shrunk covariance
-        shrunk = (1 - alpha) * S + alpha * B
+        shrunk = (1 - alpha) * s + alpha * b
 
         return shrunk
 
     @staticmethod
-    def _jorion_shrinkage(MU, MU_STAR, _lambda):
-        """
-        Applies shrinkage to the mean of weekly returns.
+    def _jorion_shrinkage(mu, mu_star, _lambda):
+        """Applies shrinkage to the mean of weekly returns.
 
         Parameters:
         - weekly_returns: numpy array or a pandas series of weekly returns.
@@ -62,35 +73,49 @@ class MomentGenerator:
         Returns:
         - shrunk_mean: float, the shrunk mean of the weekly returns.
         """
-
         # Apply the shrinkage formula
-        shrunk_mean = _lambda * MU_STAR + (1 - _lambda) * MU
+        shrunk_mean = _lambda * mu_star + (1 - _lambda) * mu
 
         return shrunk_mean
 
     @staticmethod
-    def compute_annualized_covariance(X):
-        """
-        Computes the annualized covariance matrix from weekly return data,
-        incorporating robust estimation (MCD), Ledoit-Wolf shrinkage.
+    def compute_annualized_covariance(x):
+        """Compute the annualized covariance matrix from weekly return data.
 
-        :param X: A pandas DataFrame with weekly returns for each asset.
+        Incorporating robust estimation (MCD), Ledoit-Wolf shrinkage.
+
+        :param x: A pandas DataFrame with weekly returns for each asset.
         :return: Annualized covariance matrix as a pandas DataFrame.
         """
         # Step 1: Compute Robust Covariance Matrix using MCD
-        mcd = MinCovDet().fit(X)
+        mcd = MinCovDet().fit(x)
         robust_cov_matrix = mcd.covariance_
 
         # Convert to DataFrame for compatibility with Ledoit-Wolf function
-        robust_cov_df = pd.DataFrame(robust_cov_matrix, index=X.columns, columns=X.columns)
+        robust_cov_df = pd.DataFrame(robust_cov_matrix, index=x.columns, columns=x.columns)
 
         # Step 2: Apply Ledoit-Wolf Shrinkage
-        shrunk_cov_df = MomentGenerator._ledoit_wolf_shrinkage(X, robust_cov_df)
+        shrunk_cov_df = MomentGenerator._ledoit_wolf_shrinkage(x, robust_cov_df)
 
         return shrunk_cov_df
 
     @staticmethod
     def generate_sigma_mu_for_test_periods(data: pd.DataFrame, n_test: int) -> tuple[list, list]:
+        """Generates covariance matrices and mean arrays for multiple test periods.
+
+        This method computes the covariance matrix and mean array for each investment period
+        using a rolling window approach. It applies Ledoit-Wolf shrinkage to the covariance
+        matrices to improve their stability.
+
+        Parameters:
+            data: DataFrame containing historical returns data.
+            n_test: Number of test periods.
+
+        Returns:
+            tuple: A tuple containing two lists:
+                - sigma_lst: List of covariance matrices for each period.
+                - mu_lst: List of mean arrays for each period.
+        """
         logger.info("⏳ Computing covariance matrix and mean array for each investment period")
 
         # Initialize variables
@@ -128,8 +153,7 @@ class MomentGenerator:
 
     @staticmethod
     def split_dataset(data: pd.DataFrame, sampling_ratio: float = 0.6):
-        """
-        Splits the dataset into a sampling (training) set and an estimating (testing) set.
+        """Splits the dataset into a sampling (training) set and an estimating (testing) set.
 
         Parameters:
         - data: The dataset to be split, provided as a pandas DataFrame.
@@ -139,7 +163,6 @@ class MomentGenerator:
         Returns:
         - A tuple containing two DataFrames: (sampling_set, estimating_set).
         """
-
         # Ensure the sampling ratio is between 0 and 1
         if not (0 < sampling_ratio < 1):
             raise ValueError("Sampling ratio must be between 0 and 1.")
@@ -157,9 +180,10 @@ class MomentGenerator:
     def generate_annual_sigma_mu_with_risk_free(
         data: pd.DataFrame, risk_free_rate_annual: float = 0.015
     ) -> tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]:
-        """
-        Computes the annualized and weekly covariance matrix (sigma) and mean return array (mu)
-        for the entire historical dataset, including a risk-free asset.
+        """Compute the annualized and weekly covariance matrix (sigma).
+
+        Also the mean return array (mu) for the entire historical dataset,
+        including a risk-free asset.
 
         Parameters:
         - data: A pandas DataFrame with weekly returns for each asset.
@@ -209,11 +233,10 @@ class MomentGenerator:
 
 
 class ScenarioGenerator:
-    """
-    Provides methods for scenario generation.
-    """
+    """Provides methods for scenario generation."""
 
     def __init__(self, rng: np.random.Generator):
+        """Initializes the ScenarioGenerator class."""
         self.rng = rng
 
     # ----------------------------------------------------------------------
@@ -227,6 +250,23 @@ class ScenarioGenerator:
         sigma_lst: list,
         mu_lst: list,
     ) -> np.ndarray:
+        """Generates scenarios using Monte Carlo simulation.
+
+        This method generates scenarios for each investment period using Monte Carlo simulation
+        based on the provided covariance matrices and mean arrays. It first generates weekly
+        simulations and then compounds them into monthly (4-week) returns.
+
+        Parameters:
+            data: DataFrame containing historical returns data.
+            n_simulations: Number of scenarios to generate.
+            n_test: Number of test periods.
+            sigma_lst: List of covariance matrices for each period.
+            mu_lst: List of mean arrays for each period.
+
+        Returns:
+            np.ndarray: A 3D array of monthly simulated returns with dimensions
+                        (n_rolls, n_simulations, n_indices).
+        """
         logger.info(f"⏳ Generating {n_simulations} scenarios for each investment period with Monte Carlo method")
 
         n_iter = 4  # we work with 4-week periods
@@ -257,6 +297,21 @@ class ScenarioGenerator:
     # Scenario Generation: THE BOOTSTRAPPING METHOD
     # ----------------------------------------------------------------------
     def bootstrapping(self, data: pd.DataFrame, n_simulations: int, n_test: int) -> np.ndarray:
+        """Generates scenarios using bootstrapping method.
+
+        This method generates scenarios for each investment period using bootstrapping,
+        which involves randomly sampling from historical data with replacement. It creates
+        monthly (4-week) returns by compounding randomly selected weekly returns.
+
+        Parameters:
+            data: DataFrame containing historical returns data.
+            n_simulations: Number of scenarios to generate.
+            n_test: Number of test periods.
+
+        Returns:
+            np.ndarray: A 3D array of monthly simulated returns with dimensions
+                        (n_rolls, n_simulations, n_indices).
+        """
         logger.info(f"⏳ Generating {n_simulations} scenarios for each investment period with Bootstrapping method")
 
         n_iter = 4  # 4 weeks compounded in our scenario
@@ -283,7 +338,7 @@ class ScenarioGenerator:
 
         return monthly_sim
 
-    def MC_simulation_annual_from_weekly(
+    def mc_simulation_annual_from_weekly(
         self,
         weekly_mu: pd.Series,
         weekly_sigma: pd.DataFrame,
@@ -291,8 +346,9 @@ class ScenarioGenerator:
         n_years: int,
         cash_return_annual: float = 0.015,
     ):
-        """
-        Generates Monte Carlo simulations for annual returns based on provided weekly mu and sigma.
+        """Generate Monte Carlo simulations for annual returns.
+
+        Based on provided weekly mu and sigma.
         Assumes 'Cash' or risk-free asset is already included and sets its annual return to a constant value.
 
         Parameters:
@@ -346,9 +402,9 @@ class ScenarioGenerator:
         n_years: int,
         cash_return_annual: float = 0.015,
     ) -> np.ndarray:
-        """
-        Generates bootstrap simulations for annual returns based on historical weekly returns,
-        correctly handling weekly data to compound into annual returns.
+        """Generate bootstrap simulations for annual returns based on historical weekly returns.
+
+        Correctly handling weekly data to compound into annual returns.
 
         Parameters:
         - historical_weekly_returns: DataFrame containing historical weekly returns for each asset.
