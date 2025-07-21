@@ -78,3 +78,4 @@ pep621_dev_dependency_groups = ["dev"]
 python-dateutil = ["dateutil"]
 scikit-learn = ["sklearn"]
 cvxpy-base = ["cvxpy"]  # not strictly needed, but safe
+python-dotenv = ["dotenv"]
