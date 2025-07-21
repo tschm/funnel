@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 dependencies = [
     "clarabel>=0.10.0",
     "cvxpy-base>=1.6.1",
-    "dotenv>=0.9.9",
+    "python-dotenv>=1.1.1",
     "loguru>=0.7.3",
     "matplotlib>=3.10.0",
     "mosek>=11.0.8",
@@ -35,8 +35,8 @@ repository = "https://github.com/tschm/funnel"
 dev = [
     "pytest-cov>=6.0.0",
     "pytest>=8.3.3",
-    "pre-commit>=4.0.1",
-    "ecos>=2.0.14",
+    "pre-commit>=4.0.1"
+    #"ecos>=2.0.14",
 ]
 
 [tool.ruff]
