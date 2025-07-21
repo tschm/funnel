@@ -1,5 +1,4 @@
-"""
-Tests for package-level attributes and functionality.
+"""Tests for package-level attributes and functionality.
 
 This module contains tests for package-level attributes like __version__
 and other package-wide functionality.
@@ -10,9 +9,8 @@ import re
 import ifunnel
 
 
-def test_version():
-    """
-    Test that the __version__ attribute exists and has the expected format.
+def test_version() -> None:
+    """Test that the __version__ attribute exists and has the expected format.
 
     This test verifies that:
     1. The __version__ attribute is defined in the package
