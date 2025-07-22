@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import linkage
 
-from src.ifunnel.models.clustering import fancy_dendrogram
+from ifunnel.models.clustering import fancy_dendrogram
 
 
 def test_fancy_dendrogram_basic():
