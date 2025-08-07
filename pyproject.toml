@@ -36,18 +36,7 @@ dev = [
     "pytest-cov>=6.0.0",
     "pytest>=8.3.3",
     "pre-commit>=4.0.1"
-    #"ecos>=2.0.14",
 ]
-
-[tool.ruff]
-line-length = 120
-target-version = "py312"
-exclude = [
-    "*__init__.py"
-]
-
-[tool.ruff.lint]
-select = ["E", "F", "I"]
 
 [build-system]
 requires = ["hatchling"]
@@ -62,9 +51,6 @@ include = [
     "README.md",
     "src/ifunnel"
 ]
-
-[tool.bandit]
-exclude_dirs = ["tests"]
 
 [tool.deptry.per_rule_ignores]
 DEP002 = ["clarabel","pyarrow","ecos","mosek","cvxpy-base"]
