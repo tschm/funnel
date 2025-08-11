@@ -14,7 +14,7 @@ For later...
 ### **Set Up Environment**
 
 ```bash
-make install
+task build:install
 ```
 
 This installs/updates [uv](https://github.com/astral-sh/uv),
@@ -30,7 +30,7 @@ uv add/remove requests --dev  # for dev dependencies
 ### **Configure Pre-commit Hooks**
 
 ```bash
-make fmt
+task quality:fmt
 ```
 
 Installs hooks to maintain code quality and formatting.
@@ -42,8 +42,8 @@ Installs hooks to maintain code quality and formatting.
 ## Development Commands
 
 ```bash
-make tests   # Run test suite
-make marimo  # Start Marimo notebooks
+task docs:tests   # Run test suite
+task docs:marimo  # Start Marimo notebooks
 ```
 
 ## Contributing
